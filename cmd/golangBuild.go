@@ -271,6 +271,8 @@ func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomD
 
 			targetURL := fmt.Sprintf("%s%s%s", config.TargetRepositoryURL, separator, targetPath)
 
+			commonPipelineEnvironment.custom.goBinaryPublishedURL = targetURL
+
 			log.Entry().Infof("publishing artifact: %s", targetURL)
 
 			response, err := utils.UploadRequest(http.MethodPut, targetURL, binary, "", nil, nil, "binary")

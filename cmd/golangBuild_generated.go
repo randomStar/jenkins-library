@@ -49,7 +49,8 @@ type golangBuildOptions struct {
 
 type golangBuildCommonPipelineEnvironment struct {
 	custom struct {
-		buildSettingsInfo string
+		buildSettingsInfo    string
+		goBinaryPublishedURL string
 	}
 }
 
@@ -60,6 +61,7 @@ func (p *golangBuildCommonPipelineEnvironment) persist(path, resourceName string
 		value    interface{}
 	}{
 		{category: "custom", name: "buildSettingsInfo", value: p.custom.buildSettingsInfo},
+		{category: "custom", name: "goBinaryPublishedUrl", value: p.custom.goBinaryPublishedURL},
 	}
 
 	errCount := 0
@@ -525,6 +527,7 @@ func golangBuildMetadata() config.StepData {
 						Type: "piperEnvironment",
 						Parameters: []map[string]interface{}{
 							{"name": "custom/buildSettingsInfo"},
+							{"name": "custom/goBinaryPublishedUrl"},
 						},
 					},
 					{
