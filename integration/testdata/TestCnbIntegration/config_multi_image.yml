@@ -5,6 +5,7 @@ steps:
   cnbBuild:
     containerRegistryUrl: localhost:5000
     containerImageTag: latest
+    path: test
     multipleImages:
     - path: project
     - containerImageName: go-app
