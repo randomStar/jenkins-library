@@ -212,6 +212,8 @@ func (v *Client) GenerateNewAppRoleSecret(secretID, appRoleName string) (string,
 		return "", fmt.Errorf("New secret-id from approle path %s has an unexpected type %T expected 'string'", reqPath, secretIDRaw)
 	}
 
+	log.Entry().Debugf("anil test the secret value is %v", newSecretID)
+
 	return newSecretID, nil
 }
 
