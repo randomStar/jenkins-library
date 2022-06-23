@@ -52,6 +52,8 @@ void call(Map parameters = [:], String stepName, String metadataFile, List crede
             ansHookServiceKeyCredentialsId =
                 DefaultValueCache.getInstance().getDefaultValues().hooks?.ans?.serviceKeyCredentialsId
             config += ["ansHookServiceKeyCredentialsId": ansHookServiceKeyCredentialsId]
+            script.echo "1111111: ${config}"
+            script.echo "2222222: ${config.ansHookServiceKeyCredentialsId}"
 
             // prepare stashes
             // first eliminate empty stashes
