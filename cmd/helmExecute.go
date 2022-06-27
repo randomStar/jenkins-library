@@ -98,7 +98,7 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 	for _, value := range values {
 		valuesFile, err := utils.FileRead(value)
 		if err != nil {
-			log.Entry().WithError(err).Fatalf("Error when reading appTemplate '%v'", config.HelmValues[0])
+			log.Entry().WithError(err).Fatalf("Error when reading appTemplate '%v'", valuesFile)
 		}
 		fmt.Println("====== valuesFile ======")
 		fmt.Printf("\n%v\n\n", string(valuesFile))
