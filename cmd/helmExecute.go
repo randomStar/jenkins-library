@@ -92,6 +92,14 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 		log.Entry().Warning("Error when updating appTemplate")
 	}
 
+	valuesFile, err := utils.FileRead(config.HelmValues[0])
+	if err != nil {
+		log.Entry().WithError(err).Fatalf("Error when reading appTemplate '%v'", config.HelmValues[0])
+	}
+
+	fmt.Println("====== valuesFile ======")
+	fmt.Printf("\n%v\n\n", string(valuesFile))
+
 	if len(helmConfig.PublishVersion) == 0 {
 		helmConfig.PublishVersion = artifactInfo.Version
 	}
