@@ -65,7 +65,7 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 	fmt.Println("====== CPE =======")
 	fmt.Printf("\n%+v\n\n", cpe)
 
-	values := []string{"helm/sample-k8s-node/values.yaml"}
+	values := []string{fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml")}
 	values = append(values, config.HelmValues...)
 
 	params := struct {
