@@ -90,7 +90,7 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 	}
 
 	fmt.Println("====== generatedLdflags =======")
-	fmt.Printf("\n%v\n\n", generatedLdflags)
+	fmt.Printf("\n%v\n\n", generatedLdflags.String())
 
 	err = utils.FileWrite(config.HelmValues[0], generatedLdflags.Bytes(), 0700)
 	if err != nil {
