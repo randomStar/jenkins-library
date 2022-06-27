@@ -67,7 +67,12 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 	fmt.Println("====== CPE =======")
 	fmt.Printf("\n%+v\n\n", cpe)
 
-	tmpl, err := template.New("new").ParseFiles(config.HelmValues...)
+	file, err := utils.FileRead(config.HelmValues[0])
+	if err != nil {
+		log.Entry().WithError(err).Fatalf("Error when reading appTemplate '%v'", config.HelmValues[0])
+	}
+
+	tmpl, err := template.New("new").Parse(string(file))
 	if err != nil {
 		log.Entry().Warning("failed to parse template")
 	}
