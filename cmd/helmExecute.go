@@ -67,12 +67,13 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 	fmt.Println("====== CPE =======")
 	fmt.Printf("\n%+v\n\n", cpe)
 
-	file, err := utils.FileRead(config.HelmValues[0])
-	if err != nil {
-		log.Entry().WithError(err).Fatalf("Error when reading appTemplate '%v'", config.HelmValues[0])
-	}
-
-	tmpl, err := template.New("new").Parse(string(file))
+	// file, err := utils.FileRead(config.HelmValues[0])
+	// if err != nil {
+	// 	log.Entry().WithError(err).Fatalf("Error when reading appTemplate '%v'", config.HelmValues[0])
+	// }
+	values := []string{"values.yaml"}
+	values = append(values, config.HelmValues...)
+	tmpl, err := template.ParseFiles(values...)
 	if err != nil {
 		log.Entry().Warning("failed to parse template")
 	}
@@ -83,27 +84,30 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 		// CPE: map[string]interface{}(cpe),
 		CPE: cpe,
 	}
-	var generatedLdflags bytes.Buffer
-	err = tmpl.Execute(&generatedLdflags, params)
-	if err != nil {
-		log.Entry().Warning("failed to execute template")
+
+	for _, value := range values {
+		var generatedLdflags bytes.Buffer
+		err := tmpl.ExecuteTemplate(&generatedLdflags, value, params)
+		if err != nil {
+			log.Entry().Warning("failed to execute template")
+		}
+		err = utils.FileWrite(value, generatedLdflags.Bytes(), 0777)
+		if err != nil {
+			log.Entry().Warning("Error when updating appTemplate")
+		}
 	}
 
-	fmt.Println("====== generatedLdflags =======")
-	fmt.Printf("\n%v\n\n", generatedLdflags.String())
+	// fmt.Println("====== generatedLdflags =======")
+	// fmt.Printf("\n%v\n\n", generatedLdflags.String())
 
-	err = utils.FileWrite(config.HelmValues[0], generatedLdflags.Bytes(), 0700)
-	if err != nil {
-		log.Entry().Warning("Error when updating appTemplate")
+	for _, value := range values {
+		valuesFile, err := utils.FileRead(value)
+		if err != nil {
+			log.Entry().WithError(err).Fatalf("Error when reading appTemplate '%v'", config.HelmValues[0])
+		}
+		fmt.Println("====== valuesFile ======")
+		fmt.Printf("\n%v\n\n", string(valuesFile))
 	}
-
-	valuesFile, err := utils.FileRead(config.HelmValues[0])
-	if err != nil {
-		log.Entry().WithError(err).Fatalf("Error when reading appTemplate '%v'", config.HelmValues[0])
-	}
-
-	fmt.Println("====== valuesFile ======")
-	fmt.Printf("\n%v\n\n", string(valuesFile))
 
 	if len(helmConfig.PublishVersion) == 0 {
 		helmConfig.PublishVersion = artifactInfo.Version
