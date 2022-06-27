@@ -1,8 +1,10 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"path"
+	"text/template"
 
 	"github.com/SAP/jenkins-library/pkg/kubernetes"
 	"github.com/SAP/jenkins-library/pkg/log"
@@ -64,6 +66,31 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 
 	fmt.Println("====== CPE =======")
 	fmt.Printf("\n%+v\n\n", cpe)
+
+	tmpl, err := template.New("new").ParseFiles(config.HelmValues...)
+	if err != nil {
+		log.Entry().Warning("failed to parse template")
+	}
+
+	params := struct {
+		CPE map[string]interface{}
+	}{
+		// CPE: map[string]interface{}(cpe),
+		CPE: cpe,
+	}
+	var generatedLdflags bytes.Buffer
+	err = tmpl.Execute(&generatedLdflags, params)
+	if err != nil {
+		log.Entry().Warning("failed to execute template")
+	}
+
+	fmt.Println("====== generatedLdflags =======")
+	fmt.Printf("\n%v\n\n", generatedLdflags)
+
+	err = utils.FileWrite(config.HelmValues[0], generatedLdflags.Bytes(), 0700)
+	if err != nil {
+		log.Entry().Warning("Error when updating appTemplate")
+	}
 
 	if len(helmConfig.PublishVersion) == 0 {
 		helmConfig.PublishVersion = artifactInfo.Version
