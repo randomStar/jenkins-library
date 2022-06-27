@@ -48,13 +48,11 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 		log.Entry().WithError(err).Fatalf("getting artifact information failed: %v", err)
 	}
 	artifactInfo, err := artifact.GetCoordinates()
+
 	fmt.Printf("\n%v\n\n", artifactInfo)
 
 	fmt.Println("====== Artifact Info ======")
 	fmt.Printf("\n%v\n\n", artifactInfo.ArtifactID)
-	fmt.Printf("\n%v\n\n", artifactInfo.GroupID)
-	fmt.Printf("\n%v\n\n", artifactInfo.Packaging)
-	fmt.Printf("\n%v\n\n", artifactInfo.Version)
 
 	helmConfig.DeploymentName = artifactInfo.ArtifactID
 
@@ -67,16 +65,8 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 	fmt.Println("====== CPE =======")
 	fmt.Printf("\n%+v\n\n", cpe)
 
-	// file, err := utils.FileRead(config.HelmValues[0])
-	// if err != nil {
-	// 	log.Entry().WithError(err).Fatalf("Error when reading appTemplate '%v'", config.HelmValues[0])
-	// }
 	values := []string{"helm/sample-k8s-node/values.yaml"}
 	values = append(values, config.HelmValues...)
-	tmpl, err := template.ParseFiles(values...)
-	if err != nil {
-		log.Entry().Warning("failed to parse template")
-	}
 
 	params := struct {
 		CPE map[string]interface{}
@@ -86,12 +76,20 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 	}
 
 	for _, value := range values {
-		var generatedLdflags bytes.Buffer
-		err := tmpl.ExecuteTemplate(&generatedLdflags, value, params)
+		b, err := utils.FileRead(value)
+		if err != nil {
+			log.Entry().Fatal(err)
+		}
+		tmpl, err := template.New("new").Parse(string(b))
+		if err != nil {
+			log.Entry().Fatal("failed to parse template")
+		}
+		var buf bytes.Buffer
+		err = tmpl.Execute(&buf, params)
 		if err != nil {
 			log.Entry().Warning("failed to execute template")
 		}
-		err = utils.FileWrite(value, generatedLdflags.Bytes(), 0777)
+		err = utils.FileWrite(value, buf.Bytes(), 0777)
 		if err != nil {
 			log.Entry().Warning("Error when updating appTemplate")
 		}
