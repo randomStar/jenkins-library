@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"fmt"
+	"path"
 
 	"github.com/SAP/jenkins-library/pkg/kubernetes"
 	"github.com/SAP/jenkins-library/pkg/log"
+	"github.com/SAP/jenkins-library/pkg/piperenv"
 	"github.com/SAP/jenkins-library/pkg/telemetry"
 	"github.com/SAP/jenkins-library/pkg/versioning"
 )
@@ -44,8 +46,24 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 		log.Entry().WithError(err).Fatalf("getting artifact information failed: %v", err)
 	}
 	artifactInfo, err := artifact.GetCoordinates()
+	fmt.Printf("\n%v\n\n", artifactInfo)
+
+	fmt.Println("====== Artifact Info ======")
+	fmt.Printf("\n%v\n\n", artifactInfo.ArtifactID)
+	fmt.Printf("\n%v\n\n", artifactInfo.GroupID)
+	fmt.Printf("\n%v\n\n", artifactInfo.Packaging)
+	fmt.Printf("\n%v\n\n", artifactInfo.Version)
 
 	helmConfig.DeploymentName = artifactInfo.ArtifactID
+
+	cpe := piperenv.CPEMap{}
+	err = cpe.LoadFromDisk(path.Join(GeneralConfig.EnvRootPath, "commonPipelineEnvironment"))
+	if err != nil {
+		log.Entry().Warning("failed to load values from commonPipelineEnvironment")
+	}
+
+	fmt.Println("====== CPE =======")
+	fmt.Printf("\n%+v\n\n", cpe)
 
 	if len(helmConfig.PublishVersion) == 0 {
 		helmConfig.PublishVersion = artifactInfo.Version
