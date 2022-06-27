@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"path"
+	"path/filepath"
 	"text/template"
 
 	"github.com/SAP/jenkins-library/pkg/kubernetes"
@@ -49,11 +50,6 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 	}
 	artifactInfo, err := artifact.GetCoordinates()
 
-	fmt.Printf("\n%v\n\n", artifactInfo)
-
-	fmt.Println("====== Artifact Info ======")
-	fmt.Printf("\n%v\n\n", artifactInfo.ArtifactID)
-
 	helmConfig.DeploymentName = artifactInfo.ArtifactID
 
 	cpe := piperenv.CPEMap{}
@@ -65,43 +61,39 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 	fmt.Println("====== CPE =======")
 	fmt.Printf("\n%+v\n\n", cpe)
 
-	values := []string{fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml")}
-	values = append(values, config.HelmValues...)
+	valuesFiles := []string{fmt.Sprintf("%s/%s", helmConfig.ChartPath, "values.yaml")}
+	valuesFiles = append(valuesFiles, helmConfig.HelmValues...)
 
 	params := struct {
 		CPE map[string]interface{}
 	}{
-		// CPE: map[string]interface{}(cpe),
 		CPE: cpe,
 	}
 
-	for _, value := range values {
-		b, err := utils.FileRead(value)
-		if err != nil {
-			log.Entry().Fatal(err)
-		}
-		tmpl, err := template.New("new").Parse(string(b))
-		if err != nil {
-			log.Entry().Fatal("failed to parse template")
-		}
+	tmpl, err := template.ParseFiles(valuesFiles...)
+	if err != nil {
+		log.Entry().WithError(err).Fatal("failed to parse template")
+	}
+
+	for _, valuesFile := range valuesFiles {
+		// b, err := utils.FileRead(value)
+		// if err != nil {
+		// log.Entry().Fatal(err)
+		// }
+		// tmpl, err := template.New("tmpl").Parse(string(b))
+		// if err != nil {
+		// 	log.Entry().Fatal("failed to parse template")
+		// }
+		_, file := filepath.Split(valuesFile)
 		var buf bytes.Buffer
-		err = tmpl.Execute(&buf, params)
+		err = tmpl.ExecuteTemplate(&buf, file, params)
 		if err != nil {
 			log.Entry().Warning("failed to execute template")
 		}
-		err = utils.FileWrite(value, buf.Bytes(), 0777)
+		err = utils.FileWrite(valuesFile, buf.Bytes(), 0700)
 		if err != nil {
-			log.Entry().Warning("Error when updating appTemplate")
+			log.Entry().Warning("error when updating file")
 		}
-	}
-
-	for _, value := range values {
-		valuesFile, err := utils.FileRead(value)
-		if err != nil {
-			log.Entry().WithError(err).Fatalf("Error when reading appTemplate '%v'", valuesFile)
-		}
-		fmt.Println("====== valuesFile ======")
-		fmt.Printf("\n%v\n\n", string(valuesFile))
 	}
 
 	if len(helmConfig.PublishVersion) == 0 {
