@@ -71,7 +71,7 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 	// if err != nil {
 	// 	log.Entry().WithError(err).Fatalf("Error when reading appTemplate '%v'", config.HelmValues[0])
 	// }
-	values := []string{"values.yaml"}
+	values := []string{"helm/sample-k8s-node/values.yaml"}
 	values = append(values, config.HelmValues...)
 	tmpl, err := template.ParseFiles(values...)
 	if err != nil {
@@ -96,9 +96,6 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 			log.Entry().Warning("Error when updating appTemplate")
 		}
 	}
-
-	// fmt.Println("====== generatedLdflags =======")
-	// fmt.Printf("\n%v\n\n", generatedLdflags.String())
 
 	for _, value := range values {
 		valuesFile, err := utils.FileRead(value)
