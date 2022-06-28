@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"path"
-	"path/filepath"
 	"text/template"
 
 	"github.com/SAP/jenkins-library/pkg/kubernetes"
@@ -52,49 +51,46 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 
 	helmConfig.DeploymentName = artifactInfo.ArtifactID
 
-	cpe := piperenv.CPEMap{}
-	err = cpe.LoadFromDisk(path.Join(GeneralConfig.EnvRootPath, "commonPipelineEnvironment"))
+	err = getAndRenderImageInfo(config, GeneralConfig.EnvRootPath, utils)
 	if err != nil {
-		log.Entry().Warning("failed to load values from commonPipelineEnvironment")
+		log.Entry().WithError(err).Fatalf("failed get/render image info: %w", err)
 	}
 
-	fmt.Println("====== CPE =======")
-	fmt.Printf("\n%+v\n\n", cpe)
+	// cpe := piperenv.CPEMap{}
+	// err = cpe.LoadFromDisk(path.Join(GeneralConfig.EnvRootPath, "commonPipelineEnvironment"))
+	// if err != nil {
+	// 	log.Entry().WithError(err).Fatal("failed to load values from commonPipelineEnvironment")
+	// }
 
-	valuesFiles := []string{fmt.Sprintf("%s/%s", helmConfig.ChartPath, "values.yaml")}
-	valuesFiles = append(valuesFiles, helmConfig.HelmValues...)
+	// fmt.Println("====== CPE =======")
+	// fmt.Printf("\n%+v\n\n", cpe)
 
-	params := struct {
-		CPE map[string]interface{}
-	}{
-		CPE: cpe,
-	}
+	// valuesFiles := []string{fmt.Sprintf("%s/%s", helmConfig.ChartPath, "values.yaml")}
+	// valuesFiles = append(valuesFiles, helmConfig.HelmValues...)
 
-	tmpl, err := template.ParseFiles(valuesFiles...)
-	if err != nil {
-		log.Entry().WithError(err).Fatal("failed to parse template")
-	}
+	// params := struct {
+	// 	CPE map[string]interface{}
+	// }{
+	// 	CPE: cpe,
+	// }
 
-	for _, valuesFile := range valuesFiles {
-		// b, err := utils.FileRead(value)
-		// if err != nil {
-		// log.Entry().Fatal(err)
-		// }
-		// tmpl, err := template.New("tmpl").Parse(string(b))
-		// if err != nil {
-		// 	log.Entry().Fatal("failed to parse template")
-		// }
-		_, file := filepath.Split(valuesFile)
-		var buf bytes.Buffer
-		err = tmpl.ExecuteTemplate(&buf, file, params)
-		if err != nil {
-			log.Entry().Warning("failed to execute template")
-		}
-		err = utils.FileWrite(valuesFile, buf.Bytes(), 0700)
-		if err != nil {
-			log.Entry().Warning("error when updating file")
-		}
-	}
+	// tmpl, err := template.ParseFiles(valuesFiles...)
+	// if err != nil {
+	// 	log.Entry().WithError(err).Fatal("failed to parse template")
+	// }
+
+	// for _, valuesFile := range valuesFiles {
+	// 	_, file := filepath.Split(valuesFile)
+	// 	var buf bytes.Buffer
+	// 	err = tmpl.ExecuteTemplate(&buf, file, params)
+	// 	if err != nil {
+	// 		log.Entry().WithError(err).Fatal("failed to execute template")
+	// 	}
+	// 	err = utils.FileWrite(valuesFile, buf.Bytes(), 0700)
+	// 	if err != nil {
+	// 		log.Entry().WithError(err).Fatal("error when updating file")
+	// 	}
+	// }
 
 	if len(helmConfig.PublishVersion) == 0 {
 		helmConfig.PublishVersion = artifactInfo.Version
@@ -164,5 +160,46 @@ func runHelmExecuteDefault(config helmExecuteOptions, helmExecutor kubernetes.He
 		}
 	}
 
+	return nil
+}
+
+func getAndRenderImageInfo(config helmExecuteOptions, rootPath string, utils kubernetes.DeployUtils) error {
+	cpe := piperenv.CPEMap{}
+	err := cpe.LoadFromDisk(path.Join(rootPath, "commonPipelineEnvironment"))
+	if err != nil {
+		return fmt.Errorf("failed to load values from commonPipelineEnvironment: %w", err)
+	}
+
+	fmt.Println("====== CPE =======")
+	fmt.Printf("\n%+v\n\n", cpe)
+
+	valuesFiles := []string{fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml")}
+	valuesFiles = append(valuesFiles, config.HelmValues...)
+
+	params := struct {
+		CPE map[string]interface{}
+	}{
+		CPE: cpe,
+	}
+
+	for _, valuesFile := range valuesFiles {
+		b, err := utils.FileRead(valuesFile)
+		if err != nil {
+			return fmt.Errorf("failed to read file: %w", err)
+		}
+		tmpl, err := template.New("new").Parse(string(b))
+		if err != nil {
+			return fmt.Errorf("failed to parse template: %w", err)
+		}
+		var buf bytes.Buffer
+		err = tmpl.Execute(&buf, params)
+		if err != nil {
+			return fmt.Errorf("failed to execute template: %w", err)
+		}
+		err = utils.FileWrite(valuesFile, buf.Bytes(), 0700)
+		if err != nil {
+			return fmt.Errorf("error when updateng file: %w", err)
+		}
+	}
 	return nil
 }
