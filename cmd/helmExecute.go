@@ -51,46 +51,13 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 
 	helmConfig.DeploymentName = artifactInfo.ArtifactID
 
+	fmt.Printf("\n%v\n", "====== ARTIFACT VERSION ======")
+	fmt.Println(artifactInfo.Version)
+
 	err = getAndRenderImageInfo(config, GeneralConfig.EnvRootPath, utils)
 	if err != nil {
-		log.Entry().WithError(err).Fatalf("failed get/render image info: %w", err)
+		log.Entry().WithError(err).Fatalf("failed get/render image info: %v", err)
 	}
-
-	// cpe := piperenv.CPEMap{}
-	// err = cpe.LoadFromDisk(path.Join(GeneralConfig.EnvRootPath, "commonPipelineEnvironment"))
-	// if err != nil {
-	// 	log.Entry().WithError(err).Fatal("failed to load values from commonPipelineEnvironment")
-	// }
-
-	// fmt.Println("====== CPE =======")
-	// fmt.Printf("\n%+v\n\n", cpe)
-
-	// valuesFiles := []string{fmt.Sprintf("%s/%s", helmConfig.ChartPath, "values.yaml")}
-	// valuesFiles = append(valuesFiles, helmConfig.HelmValues...)
-
-	// params := struct {
-	// 	CPE map[string]interface{}
-	// }{
-	// 	CPE: cpe,
-	// }
-
-	// tmpl, err := template.ParseFiles(valuesFiles...)
-	// if err != nil {
-	// 	log.Entry().WithError(err).Fatal("failed to parse template")
-	// }
-
-	// for _, valuesFile := range valuesFiles {
-	// 	_, file := filepath.Split(valuesFile)
-	// 	var buf bytes.Buffer
-	// 	err = tmpl.ExecuteTemplate(&buf, file, params)
-	// 	if err != nil {
-	// 		log.Entry().WithError(err).Fatal("failed to execute template")
-	// 	}
-	// 	err = utils.FileWrite(valuesFile, buf.Bytes(), 0700)
-	// 	if err != nil {
-	// 		log.Entry().WithError(err).Fatal("error when updating file")
-	// 	}
-	// }
 
 	if len(helmConfig.PublishVersion) == 0 {
 		helmConfig.PublishVersion = artifactInfo.Version
