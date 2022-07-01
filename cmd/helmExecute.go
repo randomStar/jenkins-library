@@ -52,7 +52,10 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData)
 	helmConfig.DeploymentName = artifactInfo.ArtifactID
 
 	fmt.Printf("\n%v\n", "====== ARTIFACT VERSION ======")
-	fmt.Println(artifactInfo.Version)
+	fmt.Println("artifactInfo.Version", artifactInfo.Version)
+	fmt.Println("artifactInfo.ArtifactID", artifactInfo.ArtifactID)
+	fmt.Println("artifactInfo.GroupID", artifactInfo.GroupID)
+	fmt.Println("artifactInfo.Packaging", artifactInfo.Packaging)
 
 	err = getAndRenderImageInfo(config, GeneralConfig.EnvRootPath, utils)
 	if err != nil {
