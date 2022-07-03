@@ -143,8 +143,27 @@ func getAndRenderImageInfo(config helmExecuteOptions, rootPath string, utils kub
 	fmt.Println("====== CPE =======")
 	fmt.Printf("\n%+v\n\n", cpe)
 
-	valuesFiles := []string{fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml")}
-	valuesFiles = append(valuesFiles, config.HelmValues...)
+	defaultValuesFile := fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml")
+	valuesFiles := []string{}
+
+	fmt.Println("====== if statement is started ======")
+	if len(config.HelmValues) > 0 {
+		fmt.Println("====== case when helmValues > 0 ======")
+		defaultValuesFileExists, err := utils.FileExists(defaultValuesFile)
+		if err != nil {
+			return err
+		}
+		fmt.Println("====== defaultValuesFileExists ======", defaultValuesFileExists)
+		if defaultValuesFileExists {
+			valuesFiles = append(valuesFiles, defaultValuesFile)
+		}
+		valuesFiles = append(valuesFiles, config.HelmValues...)
+	} else {
+		valuesFiles = append(valuesFiles, defaultValuesFile)
+	}
+
+	fmt.Println("====== VALUES FILES =======")
+	fmt.Printf("\n%+v\n\n", valuesFiles)
 
 	params := struct {
 		CPE map[string]interface{}

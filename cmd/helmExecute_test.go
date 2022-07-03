@@ -360,14 +360,12 @@ func newHelmMockUtilsBundle() helmMockUtilsBundle {
 			FileUploads: map[string]string{},
 		},
 	}
-	// utils.cpe = map[string]string{}
 	return utils
 }
 
 func TestGetAndRenderImageInfo(t *testing.T) {
 
 	t.Run("Template {{ .CPE.artifactVersion }} exists in CPE", func(t *testing.T) {
-		// t.Parallel()
 
 		commonPipelineEnvironment := "commonPipelineEnvironment"
 		utils := newHelmMockUtilsBundle()
@@ -399,7 +397,6 @@ func TestGetAndRenderImageInfo(t *testing.T) {
 	})
 
 	t.Run("Template {{ .CPE.artVersion }} does not exist in CPE", func(t *testing.T) {
-		// t.Parallel()
 
 		commonPipelineEnvironment := "commonPipelineEnvironment"
 		utils := newHelmMockUtilsBundle()
@@ -431,7 +428,6 @@ func TestGetAndRenderImageInfo(t *testing.T) {
 	})
 
 	t.Run("artifactVersion file does not exist in CPE", func(t *testing.T) {
-		// t.Parallel()
 
 		// commonPipelineEnvironment := "commonPipelineEnvironment"
 		utils := newHelmMockUtilsBundle()
@@ -463,7 +459,6 @@ func TestGetAndRenderImageInfo(t *testing.T) {
 	})
 
 	t.Run("Wrong template {{ .CPE.artVersion", func(t *testing.T) {
-		// t.Parallel()
 
 		// commonPipelineEnvironment := "commonPipelineEnvironment"
 		utils := newHelmMockUtilsBundle()
