@@ -193,12 +193,22 @@ func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomD
 		return err
 	}
 
-	for _, platform := range platforms {
+	fmt.Printf("\n====== %+v ======\n", "platforms")
+	fmt.Printf("\n%+v\n", platforms)
+
+	for index, platform := range platforms {
+
+		fmt.Printf("\n====== loop %+v ======\n", index)
+		fmt.Printf("\n%+v\n", platform)
+
 		binaryNames, err := runGolangBuildPerArchitecture(config, utils, ldflags, platform)
 
 		if err != nil {
 			return err
 		}
+
+		fmt.Printf("\n====== binaryNames %+v ======\n", "")
+		fmt.Printf("\n%+v\n", binaryNames)
 
 		if len(binaryNames) > 0 {
 			binaries = append(binaries, binaryNames...)
