@@ -114,6 +114,10 @@ func golangBuild(config golangBuildOptions, telemetryData *telemetry.CustomData,
 }
 
 func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomData, utils golangBuildUtils, commonPipelineEnvironment *golangBuildCommonPipelineEnvironment) error {
+
+	fmt.Printf("\n====== %v ======\n", "golang config")
+	fmt.Printf("\n%+v\n", config)
+
 	goModFile, err := readGoModFile(utils) // returns nil if go.mod doesnt exist
 	if err != nil {
 		return err
@@ -219,6 +223,9 @@ func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomD
 		log.Entry().Warnf("failed to create build settings info: %v", err)
 	}
 	commonPipelineEnvironment.custom.buildSettingsInfo = buildSettingsInfo
+
+	fmt.Printf("\n====== %v ======\n", "golang config.Publish")
+	fmt.Printf("\n%+v\n", config.Publish)
 
 	if config.Publish {
 		if len(config.TargetRepositoryURL) == 0 {

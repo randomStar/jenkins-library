@@ -107,10 +107,10 @@ func runKanikoExecute(config *kanikoExecuteOptions, telemetryData *telemetry.Cus
 	commonPipelineEnvironment.custom.buildSettingsInfo = buildSettingsInfo
 
 	fmt.Printf("\n====== %v ======\n", "commonPipelineEnvironment")
-	fmt.Printf("\n====== %+v ======\n", commonPipelineEnvironment)
+	fmt.Printf("\n%+v\n", commonPipelineEnvironment)
 
 	fmt.Printf("\n====== %v ======\n", "config")
-	fmt.Printf("\n====== %+v ======\n", config)
+	fmt.Printf("\n%+v\n", config)
 
 	fmt.Printf("\n====== %v ======\n", "commonPipelineEnvironment.container.registryURL")
 	fmt.Printf("%v\n", config.ContainerRegistryURL)
