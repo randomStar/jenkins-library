@@ -266,8 +266,14 @@ func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomD
 
 		utils.SetOptions(repoClientOptions)
 
+		fmt.Printf("\n====== %v ======\n", "golang binaries")
+		fmt.Printf("\n%+v\n", binaries)
+		fmt.Printf("\n====== %v ======\n", "for loop")
+
 		var binaryArtifacts piperenv.Artifacts
-		for _, binary := range binaries {
+		for index, binary := range binaries {
+
+			fmt.Printf("\n%v %+v\n", "iteration", index)
 
 			targetPath := fmt.Sprintf("go/%s/%s/%s", goModFile.Module.Mod.Path, config.ArtifactVersion, binary)
 
