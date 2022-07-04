@@ -458,6 +458,8 @@ func prepareLdflags(config *golangBuildOptions, utils golangBuildUtils, envRootP
 func runGolangBuildPerArchitecture(config *golangBuildOptions, utils golangBuildUtils, ldflags string, architecture multiarch.Platform) ([]string, error) {
 	var binaryNames []string
 
+	fmt.Printf("\n====== %v ======\n", "point 1")
+
 	envVars := os.Environ()
 	envVars = append(envVars, fmt.Sprintf("GOOS=%v", architecture.OS), fmt.Sprintf("GOARCH=%v", architecture.Arch))
 
@@ -469,7 +471,13 @@ func runGolangBuildPerArchitecture(config *golangBuildOptions, utils golangBuild
 	buildOptions := []string{"build", "-trimpath"}
 
 	if len(config.Output) > 0 {
+
+		fmt.Printf("\n====== %v ======\n", "point 2")
+
 		if len(config.Packages) > 1 {
+
+			fmt.Printf("\n====== %v ======\n", "point 3")
+
 			binaries, outputDir, err := getOutputBinaries(config.Output, config.Packages, utils, architecture)
 			if err != nil {
 				log.SetErrorCategory(log.ErrorBuild)
@@ -478,6 +486,9 @@ func runGolangBuildPerArchitecture(config *golangBuildOptions, utils golangBuild
 			buildOptions = append(buildOptions, "-o", outputDir)
 			binaryNames = append(binaryNames, binaries...)
 		} else {
+
+			fmt.Printf("\n====== %v ======\n", "point 4")
+
 			fileExtension := ""
 			if architecture.OS == "windows" {
 				fileExtension = ".exe"
@@ -492,6 +503,8 @@ func runGolangBuildPerArchitecture(config *golangBuildOptions, utils golangBuild
 		buildOptions = append(buildOptions, "-ldflags", ldflags)
 	}
 	buildOptions = append(buildOptions, config.Packages...)
+
+	fmt.Printf("\n====== %v ======\n", "point 5")
 
 	if err := utils.RunExecutable("go", buildOptions...); err != nil {
 		log.Entry().Debugf("buildOptions: %v", buildOptions)
