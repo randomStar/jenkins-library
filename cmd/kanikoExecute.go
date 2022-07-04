@@ -106,6 +106,18 @@ func runKanikoExecute(config *kanikoExecuteOptions, telemetryData *telemetry.Cus
 	}
 	commonPipelineEnvironment.custom.buildSettingsInfo = buildSettingsInfo
 
+	fmt.Printf("\n====== %v ======\n", "commonPipelineEnvironment")
+	fmt.Printf("\n====== %+v ======\n", commonPipelineEnvironment)
+
+	fmt.Printf("\n====== %v ======\n", "config")
+	fmt.Printf("\n====== %+v ======\n", config)
+
+	fmt.Printf("\n====== %v ======\n", "commonPipelineEnvironment.container.registryURL")
+	fmt.Printf("%v\n", config.ContainerRegistryURL)
+
+	fmt.Printf("\n====== %v ======\n", "containerImageTag")
+	fmt.Printf("%v\n", config.ContainerImageTag)
+
 	if !piperutils.ContainsString(config.BuildOptions, "--destination") {
 		dest := []string{"--no-push"}
 		if len(config.ContainerRegistryURL) > 0 && len(config.ContainerImageName) > 0 && len(config.ContainerImageTag) > 0 {
@@ -161,6 +173,10 @@ func runKanikoExecute(config *kanikoExecuteOptions, telemetryData *telemetry.Cus
 			dest = []string{"--destination", fmt.Sprintf("%v/%v", containerRegistry, containerImageNameAndTag)}
 			commonPipelineEnvironment.container.imageNameTag = containerImageNameAndTag
 		} else if len(config.ContainerImage) > 0 {
+
+			fmt.Printf("\n======= %v ======\n", "config.ContainerImage")
+			fmt.Printf("%v\n", config.ContainerImage)
+
 			log.Entry().Debugf("Single image build for image '%v'", config.ContainerImage)
 			containerRegistry, err := docker.ContainerRegistryFromImage(config.ContainerImage)
 			if err != nil {

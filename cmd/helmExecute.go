@@ -143,23 +143,28 @@ func getAndRenderImageInfo(config helmExecuteOptions, rootPath string, utils kub
 	fmt.Println("====== CPE =======")
 	fmt.Printf("\n%+v\n\n", cpe)
 
-	defaultValuesFile := fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml")
 	valuesFiles := []string{}
+	defaultValuesFile := fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml")
+	defaultValuesFileExists, err := utils.FileExists(defaultValuesFile)
+	if err != nil {
+		return err
+	}
 
 	fmt.Println("====== if statement is started ======")
 	if len(config.HelmValues) > 0 {
 		fmt.Println("====== case when helmValues > 0 ======")
-		defaultValuesFileExists, err := utils.FileExists(defaultValuesFile)
-		if err != nil {
-			return err
-		}
 		fmt.Println("====== defaultValuesFileExists ======", defaultValuesFileExists)
 		if defaultValuesFileExists {
 			valuesFiles = append(valuesFiles, defaultValuesFile)
 		}
 		valuesFiles = append(valuesFiles, config.HelmValues...)
 	} else {
-		valuesFiles = append(valuesFiles, defaultValuesFile)
+		if defaultValuesFileExists {
+			valuesFiles = append(valuesFiles, defaultValuesFile)
+		} else {
+			return fmt.Errorf("no one value file is provided, please provide at least one")
+			// return fmt.Errorf("no value file to proccess, please provide at least one")
+		}
 	}
 
 	fmt.Println("====== VALUES FILES =======")
