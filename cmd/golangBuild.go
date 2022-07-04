@@ -473,6 +473,7 @@ func runGolangBuildPerArchitecture(config *golangBuildOptions, utils golangBuild
 	if len(config.Output) > 0 {
 
 		fmt.Printf("\n====== %v ======\n", "point 2")
+		fmt.Printf("\n======output: %v ======\n", config.Output)
 
 		if len(config.Packages) > 1 {
 
@@ -505,6 +506,8 @@ func runGolangBuildPerArchitecture(config *golangBuildOptions, utils golangBuild
 	buildOptions = append(buildOptions, config.Packages...)
 
 	fmt.Printf("\n====== %v ======\n", "point 5")
+	fmt.Printf("\n====== %v ======\n", "buildOptions")
+	fmt.Printf("\n%vn", buildOptions)
 
 	if err := utils.RunExecutable("go", buildOptions...); err != nil {
 		log.Entry().Debugf("buildOptions: %v", buildOptions)
