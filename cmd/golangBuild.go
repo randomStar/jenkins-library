@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"text/template"
 
 	"github.com/SAP/jenkins-library/pkg/buildsettings"
 	"github.com/SAP/jenkins-library/pkg/certutils"
@@ -178,11 +177,11 @@ func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomD
 	ldflags := ""
 
 	if len(config.LdflagsTemplate) > 0 {
-		var err error
-		ldflags, err = prepareLdflags(config, utils, GeneralConfig.EnvRootPath)
+		ldf, err := prepareLdflags(config, utils, GeneralConfig.EnvRootPath)
 		if err != nil {
 			return err
 		}
+		ldflags = (*ldf).String()
 		log.Entry().Infof("ldflags from template: '%v'", ldflags)
 	}
 
@@ -193,15 +192,8 @@ func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomD
 		return err
 	}
 
-	fmt.Printf("\n====== %+v ======\n", "platforms")
-	fmt.Printf("\n%+v\n", platforms)
-
-	for index, platform := range platforms {
-
-		fmt.Printf("\n====== loop %+v ======\n", index)
-		fmt.Printf("\n%+v\n", platform)
-
-		binaryNames, err := runGolangBuildPerArchitecture(config, utils, ldflags, platform)
+	for _, platform := range platforms {
+		binaryNames, err := runGolangBuildPerArchitecture(config, goModFile, utils, ldflags, platform)
 
 		if err != nil {
 			return err
@@ -428,7 +420,7 @@ func reportGolangTestCoverage(config *golangBuildOptions, utils golangBuildUtils
 	return nil
 }
 
-func prepareLdflags(config *golangBuildOptions, utils golangBuildUtils, envRootPath string) (string, error) {
+func prepareLdflags(config *golangBuildOptions, utils golangBuildUtils, envRootPath string) (*bytes.Buffer, error) {
 	cpe := piperenv.CPEMap{}
 	err := cpe.LoadFromDisk(path.Join(envRootPath, "commonPipelineEnvironment"))
 	if err != nil {
@@ -436,26 +428,10 @@ func prepareLdflags(config *golangBuildOptions, utils golangBuildUtils, envRootP
 	}
 
 	log.Entry().Debugf("ldflagsTemplate in use: %v", config.LdflagsTemplate)
-	tmpl, err := template.New("ldflags").Parse(config.LdflagsTemplate)
-	if err != nil {
-		return "", fmt.Errorf("failed to parse ldflagsTemplate '%v': %w", config.LdflagsTemplate, err)
-	}
-
-	ldflagsParams := struct {
-		CPE map[string]interface{}
-	}{
-		CPE: map[string]interface{}(cpe),
-	}
-	var generatedLdflags bytes.Buffer
-	err = tmpl.Execute(&generatedLdflags, ldflagsParams)
-	if err != nil {
-		return "", fmt.Errorf("failed to execute ldflagsTemplate '%v': %w", config.LdflagsTemplate, err)
-	}
-
-	return generatedLdflags.String(), nil
+	return cpe.ParseTemplate(config.LdflagsTemplate)
 }
 
-func runGolangBuildPerArchitecture(config *golangBuildOptions, utils golangBuildUtils, ldflags string, architecture multiarch.Platform) ([]string, error) {
+func runGolangBuildPerArchitecture(config *golangBuildOptions, goModFile *modfile.File, utils golangBuildUtils, ldflags string, architecture multiarch.Platform) ([]string, error) {
 	var binaryNames []string
 
 	fmt.Printf("\n====== %v ======\n", "point 1")
@@ -498,6 +474,10 @@ func runGolangBuildPerArchitecture(config *golangBuildOptions, utils golangBuild
 			buildOptions = append(buildOptions, "-o", binaryName)
 			binaryNames = append(binaryNames, binaryName)
 		}
+	} else {
+		// use default name in case no name is defined via Output
+		binaryName := path.Base(goModFile.Module.Mod.Path)
+		binaryNames = append(binaryNames, binaryName)
 	}
 	buildOptions = append(buildOptions, config.BuildFlags...)
 	if len(ldflags) > 0 {
