@@ -45,7 +45,12 @@ func (c *CPEMap) cpe(element string) string {
 	// ToDo: perform validity checks to allow only selected fields for now?
 	// This would allow a stable contract and could perform conversions in case a contract changes.
 
+	fmt.Printf("%v\n", *c)
+
 	el, _ := map[string]interface{}(*c)[element].(string)
+
+	fmt.Printf("%v\n", el)
+
 	return el
 }
 
@@ -78,8 +83,21 @@ func (c *CPEMap) imageDigest(imageName string) string {
 }
 
 func (c *CPEMap) imageTag(imageName string) string {
-	nameTags, _ := map[string]interface{}(*c)["container/imageNameTags"].([]string)
+
+	fmt.Printf("c *CPE == %v\n", *c)
+
+	fmt.Printf("imageName == %v\n", imageName)
+
+	nameTags, ok := map[string]interface{}(*c)["container/imageNameTags"].([]string)
+
+	fmt.Printf("OK == %v\n", ok)
+
+	fmt.Printf("nameTags == %v\n", nameTags)
+
 	for _, nameTag := range nameTags {
+
+		fmt.Printf("nameTag == %v\n", nameTag)
+
 		nt := strings.Split(nameTag, ":")
 		if nt[0] == imageName {
 			return nt[1]

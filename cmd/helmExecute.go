@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
 	"path"
-	"text/template"
 
 	"github.com/SAP/jenkins-library/pkg/kubernetes"
 	"github.com/SAP/jenkins-library/pkg/log"
@@ -166,34 +164,44 @@ func getAndRenderImageInfo(config helmExecuteOptions, rootPath string, utils kub
 			valuesFiles = append(valuesFiles, defaultValuesFile)
 		} else {
 			return fmt.Errorf("no one value file is provided, please provide at least one")
-			// return fmt.Errorf("no value file to proccess, please provide at least one")
+			// return fmt.Errorf("no value file to proccess, please provide value file(s)")
 		}
 	}
 
 	fmt.Println("====== VALUES FILES =======")
 	fmt.Printf("\n%+v\n\n", valuesFiles)
 
-	params := struct {
-		CPE map[string]interface{}
-	}{
-		CPE: cpe,
-	}
+	// params := struct {
+	// 	CPE map[string]interface{}
+	// }{
+	// 	CPE: cpe,
+	// }
 
 	for _, valuesFile := range valuesFiles {
-		b, err := utils.FileRead(valuesFile)
+		cpeTemplate, err := utils.FileRead(valuesFile)
 		if err != nil {
 			return fmt.Errorf("failed to read file: %w", err)
 		}
-		tmpl, err := template.New("new").Parse(string(b))
+
+		fmt.Printf("%+v cpeTemplate file:\n", string(cpeTemplate))
+
+		generated, err := cpe.ParseTemplate(string(cpeTemplate))
 		if err != nil {
-			return fmt.Errorf("failed to parse template: %w", err)
+			return fmt.Errorf("failed to parse template: %v", err)
 		}
-		var buf bytes.Buffer
-		err = tmpl.Execute(&buf, params)
-		if err != nil {
-			return fmt.Errorf("failed to execute template: %w", err)
-		}
-		err = utils.FileWrite(valuesFile, buf.Bytes(), 0700)
+
+		fmt.Printf("generated: %+v\n", generated.String())
+
+		// tmpl, err := template.New("new").Parse(string(b))
+		// if err != nil {
+		// 	return fmt.Errorf("failed to parse template: %w", err)
+		// }
+		// var buf bytes.Buffer
+		// err = tmpl.Execute(&buf, params)
+		// if err != nil {
+		// 	return fmt.Errorf("failed to execute template: %w", err)
+		// }
+		err = utils.FileWrite(valuesFile, generated.Bytes(), 0700)
 		if err != nil {
 			return fmt.Errorf("error when updateng file: %w", err)
 		}
