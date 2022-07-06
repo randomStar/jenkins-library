@@ -142,7 +142,21 @@ func getAndRenderImageInfo(config helmExecuteOptions, rootPath string, utils kub
 	}
 
 	fmt.Println("====== CPE =======")
-	fmt.Printf("\n%+v\n\n", cpe)
+	fmt.Printf("\n%T, %+v\n\n", cpe, cpe)
+	fmt.Printf("\n%T, %+v\n\n", cpe["artifactVersion"], cpe["artifactVersion"])
+	fmt.Printf("\n%T, %+v\n\n", cpe["container/imageNames"], cpe["container/imageNames"])
+	fmt.Printf("\n%T, %+v\n\n", cpe["custom/nativeBuild"], cpe["custom/nativeBuild"])
+
+	for key, value := range cpe {
+		fmt.Printf("\nkey=%v, value=%v, type=%T\n", key, value, value)
+	}
+
+	fmt.Println("")
+
+	c := map[string]interface{}(cpe)
+	for key, value := range c {
+		fmt.Printf("\nkey=%v, value=%v, type=%T\n", key, value, value)
+	}
 
 	valuesFiles := []string{}
 	defaultValuesFile := fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml")

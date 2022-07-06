@@ -54,8 +54,9 @@ func (c *CPEMap) cpe(element string) string {
 	return el
 }
 
-func (c *CPEMap) custom(element string) string {
-	el, _ := map[string]interface{}(*c)[fmt.Sprintf("custom/%v", element)].(string)
+func (c *CPEMap) custom(element string) interface{} {
+	// el, _ := map[string]interface{}(*c)[fmt.Sprintf("custom/%v", element)].(string)
+	el, _ := map[string]interface{}(*c)[fmt.Sprintf("custom/%v", element)].(interface{})
 	return el
 }
 
@@ -88,7 +89,8 @@ func (c *CPEMap) imageTag(imageName string) string {
 
 	fmt.Printf("imageName == %v\n", imageName)
 
-	nameTags, ok := map[string]interface{}(*c)["container/imageNameTags"].([]string)
+	// nameTags, ok := map[string]interface{}(*c)["container/imageNameTags"].([]string)
+	nameTags, ok := map[string]interface{}(*c)["container/imageNameTags"].([]interface{})
 
 	fmt.Printf("OK == %v\n", ok)
 
@@ -96,9 +98,10 @@ func (c *CPEMap) imageTag(imageName string) string {
 
 	for _, nameTag := range nameTags {
 
-		fmt.Printf("nameTag == %v\n", nameTag)
+		nameTagStr, _ := nameTag.(string)
+		fmt.Printf("nameTagStr == %v   %T\n", nameTagStr, nameTagStr)
 
-		nt := strings.Split(nameTag, ":")
+		nt := strings.Split(nameTagStr, ":")
 		if nt[0] == imageName {
 			return nt[1]
 		}
