@@ -153,11 +153,6 @@ func getAndRenderImageInfo(config helmExecuteOptions, rootPath string, utils kub
 
 	fmt.Println("")
 
-	c := map[string]interface{}(cpe)
-	for key, value := range c {
-		fmt.Printf("\nkey=%v, value=%v, type=%T\n", key, value, value)
-	}
-
 	valuesFiles := []string{}
 	defaultValuesFile := fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml")
 	defaultValuesFileExists, err := utils.FileExists(defaultValuesFile)
@@ -185,19 +180,13 @@ func getAndRenderImageInfo(config helmExecuteOptions, rootPath string, utils kub
 	fmt.Println("====== VALUES FILES =======")
 	fmt.Printf("\n%+v\n\n", valuesFiles)
 
-	// params := struct {
-	// 	CPE map[string]interface{}
-	// }{
-	// 	CPE: cpe,
-	// }
-
 	for _, valuesFile := range valuesFiles {
 		cpeTemplate, err := utils.FileRead(valuesFile)
 		if err != nil {
 			return fmt.Errorf("failed to read file: %w", err)
 		}
 
-		fmt.Printf("%+v cpeTemplate file:\n", string(cpeTemplate))
+		fmt.Printf("cpeTemplate file: %+v \n", string(cpeTemplate))
 
 		generated, err := cpe.ParseTemplate(string(cpeTemplate))
 		if err != nil {
