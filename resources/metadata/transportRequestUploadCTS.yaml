@@ -149,4 +149,4 @@ spec:
           - name: custom/transportRequestId
   containers:
     - name: fiori-client
-      image: node
+      image: adnanawan/fiori-client
