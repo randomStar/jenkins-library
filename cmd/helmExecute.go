@@ -172,8 +172,8 @@ func getAndRenderImageInfo(config helmExecuteOptions, rootPath string, utils kub
 		if defaultValuesFileExists {
 			valuesFiles = append(valuesFiles, defaultValuesFile)
 		} else {
-			return fmt.Errorf("no one value file is provided, please provide at least one")
-			// return fmt.Errorf("no value file to proccess, please provide value file(s)")
+			// return fmt.Errorf("no one value file is provided, please provide at least one")
+			return fmt.Errorf("no value file to proccess, please provide value file(s)")
 		}
 	}
 
