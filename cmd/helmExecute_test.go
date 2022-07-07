@@ -332,19 +332,6 @@ func TestRunHelmDefaultCommand(t *testing.T) {
 
 }
 
-var valuesYaml = []byte(`
-image: "image_1"
-tag: {{ .CPE.artifactVersion }}
-`)
-var values1Yaml = []byte(`
-image: "image_2"
-tag: {{ .CPE.artVersion }}
-`)
-var values3Yaml = []byte(`
-image: "image_2"
-tag: {{ .CPE.artVersion
-`)
-
 type helmMockUtilsBundle struct {
 	*mock.ExecMockRunner
 	*mock.FilesMock
@@ -364,214 +351,89 @@ func newHelmMockUtilsBundle() helmMockUtilsBundle {
 }
 
 func TestGetAndRenderImageInfo(t *testing.T) {
+	commonPipelineEnvironment := "commonPipelineEnvironment"
+	valuesYaml := []byte(`
+image: "image_1"
+tag: {{ .CPE.artifactVersion }}
+`)
+	values1Yaml := []byte(`
+image: "image_2"
+tag: {{ .CPE.artVersion }}
+`)
+	values3Yaml := []byte(`
+image: "image_3"
+tag: {{ .CPE.artVersion
+`)
 
-	t.Run("Template {{ .CPE.artifactVersion }} exists in CPE", func(t *testing.T) {
+	tmpDir, err := os.MkdirTemp(os.TempDir(), "test-data-*")
+	require.NoError(t, err)
+	err = os.Mkdir(path.Join(tmpDir, commonPipelineEnvironment), 0700)
+	require.NoError(t, err)
+	err = os.WriteFile(path.Join(tmpDir, commonPipelineEnvironment, "artifactVersion"), []byte("1.0.0-123456789"), 0700)
+	require.NoError(t, err)
+	t.Cleanup(func() {
+		os.RemoveAll(tmpDir)
+	})
 
-		commonPipelineEnvironment := "commonPipelineEnvironment"
+	config := helmExecuteOptions{
+		ChartPath: ".",
+	}
+
+	t.Run("'artifactVersion' file exists in CPE", func(t *testing.T) {
 		utils := newHelmMockUtilsBundle()
-		tmpDir, err := os.MkdirTemp(os.TempDir(), "test-data-*")
-		require.NoError(t, err)
-		err = os.Mkdir(path.Join(tmpDir, commonPipelineEnvironment), 0700)
-		require.NoError(t, err)
-		t.Cleanup(func() {
-			os.RemoveAll(tmpDir)
-		})
-		fmt.Println(tmpDir)
-
-		err = os.WriteFile(path.Join(tmpDir, commonPipelineEnvironment, "artifactVersion"), []byte("1.0.0-123456789"), 0700)
-		require.NoError(t, err)
-
-		config := helmExecuteOptions{
-			ChartPath: ".",
-		}
 		utils.AddFile(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"), valuesYaml)
 
 		err = getAndRenderImageInfo(config, tmpDir, utils)
-		require.NoError(t, err)
-
-		f, err := utils.FileRead(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"))
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println(string(f))
+		assert.NoError(t, err)
 	})
 
-	t.Run("Template {{ .CPE.artVersion }} does not exist in CPE", func(t *testing.T) {
-
-		commonPipelineEnvironment := "commonPipelineEnvironment"
+	t.Run("'artVersion' file does not exist in CPE", func(t *testing.T) {
 		utils := newHelmMockUtilsBundle()
-		tmpDir, err := os.MkdirTemp(os.TempDir(), "test-data-*")
-		require.NoError(t, err)
-		err = os.Mkdir(path.Join(tmpDir, commonPipelineEnvironment), 0700)
-		require.NoError(t, err)
-		t.Cleanup(func() {
-			os.RemoveAll(tmpDir)
-		})
-		fmt.Println(tmpDir)
-
-		err = os.WriteFile(path.Join(tmpDir, commonPipelineEnvironment, "artifactVersion"), []byte("1.0.0-123456789"), 0700)
-		require.NoError(t, err)
-
-		config := helmExecuteOptions{
-			ChartPath: ".",
-		}
 		utils.AddFile(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"), values1Yaml)
 
 		err = getAndRenderImageInfo(config, tmpDir, utils)
-		require.NoError(t, err)
-
-		f, err := utils.FileRead(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"))
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println(string(f))
-	})
-
-	t.Run("artifactVersion file does not exist in CPE", func(t *testing.T) {
-
-		// commonPipelineEnvironment := "commonPipelineEnvironment"
-		utils := newHelmMockUtilsBundle()
-		tmpDir, err := os.MkdirTemp(os.TempDir(), "test-data-*")
-		require.NoError(t, err)
-		// err = os.Mkdir(path.Join(tmpDir, commonPipelineEnvironment), 0700)
-		// require.NoError(t, err)
-		t.Cleanup(func() {
-			os.RemoveAll(tmpDir)
-		})
-		fmt.Println(tmpDir)
-
-		// err = os.WriteFile(path.Join(tmpDir, commonPipelineEnvironment, "artifactVersion"), []byte("1.0.0-123456789"), 0700)
-		// require.NoError(t, err)
-
-		config := helmExecuteOptions{
-			ChartPath: ".",
-		}
-		utils.AddFile(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"), values1Yaml)
-
-		err = getAndRenderImageInfo(config, tmpDir, utils)
-		require.NoError(t, err)
-
-		f, err := utils.FileRead(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"))
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println(string(f))
+		assert.NoError(t, err)
 	})
 
 	t.Run("Wrong template {{ .CPE.artVersion", func(t *testing.T) {
-
-		// commonPipelineEnvironment := "commonPipelineEnvironment"
 		utils := newHelmMockUtilsBundle()
-		tmpDir, err := os.MkdirTemp(os.TempDir(), "test-data-*")
-		require.NoError(t, err)
-		// err = os.Mkdir(path.Join(tmpDir, commonPipelineEnvironment), 0700)
-		// require.NoError(t, err)
-		t.Cleanup(func() {
-			os.RemoveAll(tmpDir)
-		})
-		fmt.Println(tmpDir)
-
-		// err = os.WriteFile(path.Join(tmpDir, commonPipelineEnvironment, "artifactVersion"), []byte("1.0.0-123456789"), 0700)
-		// require.NoError(t, err)
-
-		config := helmExecuteOptions{
-			ChartPath: ".",
-		}
 		utils.AddFile(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"), values3Yaml)
 
 		err = getAndRenderImageInfo(config, tmpDir, utils)
 		assert.EqualError(t, err, "failed to parse template: template: new:4: unclosed action started at new:3")
-
-		f, err := utils.FileRead(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"))
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println(string(f))
 	})
 
 	t.Run("Multiple values files", func(t *testing.T) {
-		// t.Parallel()
+		config.HelmValues = []string{"./values_1.yaml", "./values_2.yaml"}
 
-		commonPipelineEnvironment := "commonPipelineEnvironment"
 		utils := newHelmMockUtilsBundle()
-		tmpDir, err := os.MkdirTemp(os.TempDir(), "test-data-*")
-		require.NoError(t, err)
-		err = os.Mkdir(path.Join(tmpDir, commonPipelineEnvironment), 0700)
-		require.NoError(t, err)
-		t.Cleanup(func() {
-			os.RemoveAll(tmpDir)
-		})
-		fmt.Println(tmpDir)
-
-		err = os.WriteFile(path.Join(tmpDir, commonPipelineEnvironment, "artifactVersion"), []byte("1.0.0-123456789"), 0700)
-		require.NoError(t, err)
-
-		config := helmExecuteOptions{
-			ChartPath: ".",
-			HelmValues: []string{
-				"./values_1.yaml",
-				"./values_2.yaml",
-			},
-		}
 		utils.AddFile(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"), valuesYaml)
 		utils.AddFile(config.HelmValues[0], valuesYaml)
 		utils.AddFile(config.HelmValues[1], valuesYaml)
 
 		err = getAndRenderImageInfo(config, tmpDir, utils)
 		assert.NoError(t, err)
+	})
 
-		f, err := utils.FileRead(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"))
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println(string(f))
+	t.Run("No one values file is provided", func(t *testing.T) {
+		// config.HelmValues = []string{"./values_1.yaml", "./values_2.yaml"}
 
-		ff, err := utils.FileRead(config.HelmValues[0])
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println(string(ff))
+		utils := newHelmMockUtilsBundle()
+		// utils.AddFile(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"), valuesYaml)
+		// utils.AddFile(config.HelmValues[0], valuesYaml)
+		// utils.AddFile(config.HelmValues[1], valuesYaml)
 
-		fff, err := utils.FileRead(config.HelmValues[1])
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println(string(fff))
+		err = getAndRenderImageInfo(config, tmpDir, utils)
+		assert.EqualError(t, err, "failed to read file: could not read './values.yaml'")
 	})
 
 	t.Run("Wrong path to values file", func(t *testing.T) {
-		// t.Parallel()
+		config.HelmValues = []string{"wrong/path/to/values_1.yaml"}
 
-		commonPipelineEnvironment := "commonPipelineEnvironment"
 		utils := newHelmMockUtilsBundle()
-		tmpDir, err := os.MkdirTemp(os.TempDir(), "test-data-*")
-		require.NoError(t, err)
-		err = os.Mkdir(path.Join(tmpDir, commonPipelineEnvironment), 0700)
-		require.NoError(t, err)
-		t.Cleanup(func() {
-			os.RemoveAll(tmpDir)
-		})
-		fmt.Println(tmpDir)
-
-		err = os.WriteFile(path.Join(tmpDir, commonPipelineEnvironment, "artifactVersion"), []byte("1.0.0-123456789"), 0700)
-		require.NoError(t, err)
-
-		config := helmExecuteOptions{
-			ChartPath: ".",
-			HelmValues: []string{
-				"wrong/path/to/values_1.yaml",
-			},
-		}
 		utils.AddFile(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"), valuesYaml)
 
 		err = getAndRenderImageInfo(config, tmpDir, utils)
 		assert.EqualError(t, err, "failed to read file: could not read 'wrong/path/to/values_1.yaml'")
-
-		f, err := utils.FileRead(fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml"))
-		if err != nil {
-			fmt.Println(err)
-		}
-		fmt.Println(string(f))
 	})
-
 }
