@@ -137,10 +137,6 @@ func runHelmExecuteDefault(config helmExecuteOptions, helmExecutor kubernetes.He
 	return nil
 }
 
-// add temporary logic to parse and render template files
-// rename getAndRenderImageInfo to parseAndRenderCPETemplate
-// getAndRenderCPETemplate ???
-// parseAndRenderCPETemplate ???
 func getAndRenderImageInfo(config helmExecuteOptions, rootPath string, utils kubernetes.DeployUtils) error {
 	cpe := piperenv.CPEMap{}
 	err := cpe.LoadFromDisk(path.Join(rootPath, "commonPipelineEnvironment"))
@@ -161,33 +157,24 @@ func getAndRenderImageInfo(config helmExecuteOptions, rootPath string, utils kub
 	fmt.Printf("\n%T, %+v\n\n", cpe["custom/nativeBuild"], cpe["custom/nativeBuild"])
 
 	for key, value := range cpe {
-		fmt.Printf("\nkey=%v, value=%v, type=%T\n", key, value, value)
+		fmt.Printf("key=%v, value=%v, type=%T\n", key, value, value)
 	}
 
 	fmt.Println("")
 
 	valuesFiles := []string{}
 	defaultValuesFile := fmt.Sprintf("%s/%s", config.ChartPath, "values.yaml")
-	defaultValuesFileExists, err := utils.FileExists(defaultValuesFile)
-	if err != nil {
+	if defaultValuesFileExists, err := utils.FileExists(defaultValuesFile); err != nil {
 		return err
-	}
-
-	fmt.Println("====== if statement is started ======")
-	if len(config.HelmValues) > 0 {
-		fmt.Println("====== case when helmValues > 0 ======")
-		fmt.Println("====== defaultValuesFileExists ======", defaultValuesFileExists)
-		if defaultValuesFileExists {
-			valuesFiles = append(valuesFiles, defaultValuesFile)
-		}
-		valuesFiles = append(valuesFiles, config.HelmValues...)
+	} else if defaultValuesFileExists {
+		valuesFiles = append(valuesFiles, defaultValuesFile)
 	} else {
-		if defaultValuesFileExists {
-			valuesFiles = append(valuesFiles, defaultValuesFile)
-		} else {
+		if len(config.HelmValues) == 0 {
 			return fmt.Errorf("no value file to proccess, please provide value file(s)")
 		}
 	}
+
+	valuesFiles = append(valuesFiles, config.HelmValues...)
 
 	fmt.Println("====== VALUES FILES =======")
 	fmt.Printf("\n%+v\n\n", valuesFiles)
