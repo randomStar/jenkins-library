@@ -29,8 +29,10 @@ type pythonBuildUtilsBundle struct {
 
 func newPythonBuildUtils() pythonBuildUtils {
 	utils := pythonBuildUtilsBundle{
-		Command: &command.Command{},
-		Files:   &piperutils.Files{},
+		Command: &command.Command{
+			URLReportFileName: "http.log",
+		},
+		Files: &piperutils.Files{},
 	}
 	// Reroute command output to logging framework
 	utils.Stdout(log.Writer())
@@ -108,6 +110,7 @@ func buildExecute(config *pythonBuildOptions, utils pythonBuildUtils, pipInstall
 	flags = append(flags, "setup.py", "sdist", "bdist_wheel")
 
 	log.Entry().Info("starting building python project:")
+
 	err := utils.RunExecutable(virutalEnvironmentPathMap["python"], flags...)
 	if err != nil {
 		return err
