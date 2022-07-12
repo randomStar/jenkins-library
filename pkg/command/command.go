@@ -17,7 +17,7 @@ import (
 )
 
 const (
-	RelaxedURLRegEx = `(http|ftp|https):\/\/([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])`
+	RelaxedURLRegEx = `/\s(http[^\s]+)/i`
 )
 
 // Command defines the information required for executing a call to any executable
