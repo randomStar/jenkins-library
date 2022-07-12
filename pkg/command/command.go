@@ -292,9 +292,9 @@ func (c *Command) startCmd(cmd *exec.Cmd) (*execution, error) {
 func handleURLs(s, file string) {
 	reg := regexp.MustCompile(RelaxedURLRegEx)
 	matches := reg.FindAllStringSubmatch(s, -1)
-	f, err := os.Create(file)
+	f, err := os.OpenFile(file, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		log.Entry().WithError(err).Info("failed to create url report file")
+		log.Entry().WithError(err).Info("failed to create / update http.log file")
 	}
 	defer f.Close()
 	for _, match := range matches {
