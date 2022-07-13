@@ -75,7 +75,7 @@ import static com.sap.piper.Prerequisites.checkScript
      * Retrieve transport request from git commit history.
      * @possibleValues `true`, `false`
      */
-    //'transportRequestReqIDFromGit'
+    'transportRequestReqIDFromGit'
 ]
 @Field Set STEP_CONFIG_KEYS = GENERAL_CONFIG_KEYS.plus(STAGE_STEP_KEYS)
 @Field Set PARAMETER_KEYS = STEP_CONFIG_KEYS.plus([
