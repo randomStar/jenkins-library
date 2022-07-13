@@ -176,11 +176,6 @@ void call(Map parameters = [:]) {
             .withMandatoryProperty('buildTool')
             .use()
 
-        echo "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY : ${config}"
-        if (config.transportRequestReqIDFromGit) {
-            echo "Retrieving transportRequestID from git commit history"
-            transportRequestReqIDFromGit(script: script)
-        }
 
         if (config.legacyConfigSettings) {
             Map legacyConfigSettings = readYaml(text: libraryResource(config.legacyConfigSettings))
@@ -203,6 +198,12 @@ void call(Map parameters = [:]) {
         }
 
         initStashConfiguration(script, config.stashSettings, config.customStashSettings, config.verbose ?: false)
+        
+                echo "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY : ${config}"
+        if (config.transportRequestReqIDFromGit) {
+            echo "Retrieving transportRequestID from git commit history"
+            transportRequestReqIDFromGit(script: script)
+        }
 
         if (config.verbose) {
             echo "piper-lib-os  configuration: ${script.commonPipelineEnvironment.configuration}"
