@@ -196,6 +196,10 @@ func (exec *Execute) executeScript(packageJSON string, script string, runOptions
 	if err != nil {
 		return fmt.Errorf("failed to run npm script %s: %w", script, err)
 	}
+	err = execRunner.RunExecutable("ls", "-la")
+		if err != nil {
+		return fmt.Errorf("Unable to list the contents %s: %w", script, err)
+	}
 
 	err = exec.Utils.Chdir(oldWorkingDirectory)
 	if err != nil {
