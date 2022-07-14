@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"path/filepath"
 	"strings"
 
@@ -196,11 +197,11 @@ func (exec *Execute) executeScript(packageJSON string, script string, runOptions
 	if err != nil {
 		return fmt.Errorf("failed to run npm script %s: %w", script, err)
 	}
-	
+
 	files, err := ioutil.ReadDir(".")
 	fmt.Println("xxxxxxxxxxxx")
 	if err != nil {
-		log.Fatal(err)
+	return fmt.Errorf("cannot list directories")
 	}
 
 	for _, file := range files {
