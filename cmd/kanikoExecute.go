@@ -82,7 +82,7 @@ func runKanikoExecute(config *kanikoExecuteOptions, telemetryData *telemetry.Cus
 		}
 	}
 
-	if err := fileUtils.FileWrite("/kaniko/.docker/config.json", dockerConfig, 0644); err != nil {
+	if err := fileUtils.FileWrite("/kaniko/.docker/config.json", dockerConfig, 0666); err != nil {
 		return errors.Wrap(err, "failed to write file '/kaniko/.docker/config.json'")
 	}
 
