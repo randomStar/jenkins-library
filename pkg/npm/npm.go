@@ -118,6 +118,7 @@ func registryRequiresConfiguration(preConfiguredRegistry, url string) bool {
 
 // RunScriptsInAllPackages runs all scripts defined in ExecuteOptions.RunScripts
 func (exec *Execute) RunScriptsInAllPackages(runScripts []string, runOptions []string, scriptOptions []string, virtualFrameBuffer bool, excludeList []string, packagesList []string) error {
+	fmt.Println("xxxxx Entering method run script in all packages")
 	var packageJSONFiles []string
 	var err error
 
@@ -163,6 +164,7 @@ func (exec *Execute) RunScriptsInAllPackages(runScripts []string, runOptions []s
 }
 
 func (exec *Execute) executeScript(packageJSON string, script string, runOptions []string, scriptOptions []string) error {
+	fmt.Println("xxxxx Entering method execute script")
 	execRunner := exec.Utils.GetExecRunner()
 	oldWorkingDirectory, err := exec.Utils.Getwd()
 	if err != nil {
