@@ -122,6 +122,15 @@ func (exec *Execute) RunScriptsInAllPackages(runScripts []string, runOptions []s
 	var packageJSONFiles []string
 	var err error
 
+		files, err := ioutil.ReadDir(".")
+	fmt.Println("xxxxxxxxxxx: after entering run script in all packages method")
+	if err != nil {
+	return fmt.Errorf("cannot list directories")
+	}
+		for _, file := range files {
+        		fmt.Println(file.Name())
+        	}
+
 	if len(packagesList) > 0 {
 		packageJSONFiles = packagesList
 	} else {
@@ -198,16 +207,6 @@ func (exec *Execute) executeScript(packageJSON string, script string, runOptions
 	err = execRunner.RunExecutable("npm", npmRunArgs...)
 	if err != nil {
 		return fmt.Errorf("failed to run npm script %s: %w", script, err)
-	}
-
-	files, err := ioutil.ReadDir(".")
-	fmt.Println("xxxxxxxxxxxx")
-	if err != nil {
-	return fmt.Errorf("cannot list directories")
-	}
-
-	for _, file := range files {
-		fmt.Println(file.Name())
 	}
 
 	err = exec.Utils.Chdir(oldWorkingDirectory)
