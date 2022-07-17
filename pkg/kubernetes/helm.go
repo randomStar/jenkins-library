@@ -368,12 +368,15 @@ func (h *HelmExecute) RunHelmDependency() error {
 
 	helmParams = append(helmParams, h.config.ChartPath)
 
-	if len(h.config.TargetRepositoryUser) != 0 && len(h.config.TargetRepositoryPassword) != 0 {
-		err := h.runHelmAdd()
-		if err != nil {
-			return fmt.Errorf("failed to add a chart repository: %v", err)
-		}
-	}
+	fmt.Println("config.TargetRepoUser", h.config.TargetRepositoryUser)
+	fmt.Println("config.TargetRepoPassword", h.config.TargetRepositoryPassword)
+
+	// if len(h.config.TargetRepositoryUser) != 0 && len(h.config.TargetRepositoryPassword) != 0 {
+	// 	err := h.runHelmAdd()
+	// 	if err != nil {
+	// 		return fmt.Errorf("failed to add a chart repository: %v", err)
+	// 	}
+	// }
 
 	if len(h.config.AdditionalParameters) > 0 {
 		helmParams = append(helmParams, h.config.AdditionalParameters...)
