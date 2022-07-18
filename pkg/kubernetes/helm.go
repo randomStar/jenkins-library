@@ -398,6 +398,18 @@ func (h *HelmExecute) RunHelmDependency() error {
 		return err
 	}
 
+	dirExists, err := h.utils.DirExists("./helm/azure-demo-k8s-go/charts")
+	if err != nil {
+		fmt.Println("DEPENDENCY ERR: h.utils.DirExists")
+		return err
+	}
+	fmt.Println(dirExists)
+	err = h.utils.Chmod("./helm/azure-demo-k8s-go/charts", 0777)
+	if err != nil {
+		fmt.Println("DEPENDENCY ERR: h.utils.Chmod")
+		return err
+	}
+
 	return nil
 }
 
