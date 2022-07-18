@@ -251,8 +251,8 @@ spec:
         - /busybox/tail -f /dev/null
       shell: /busybox/sh
       options:
-        # - name: -u
-          # value: "0"
+        - name: -u
+          value: "0"
         - name: --entrypoint
           value: ""
       env:

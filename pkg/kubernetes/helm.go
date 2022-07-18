@@ -386,6 +386,18 @@ func (h *HelmExecute) RunHelmDependency() error {
 		log.Entry().WithError(err).Fatal("Helm dependency call failed")
 	}
 
+	fileExists, err := h.utils.FileExists("./helm/azure-demo-k8s-go/charts/nginx-13.1.1.tgz")
+	if err != nil {
+		fmt.Println("DEPENDENCY ERR: h.utils.FileExists")
+		return err
+	}
+	fmt.Println(fileExists)
+	err = h.utils.Chmod("./helm/azure-demo-k8s-go/charts/nginx-13.1.1.tgz", 0777)
+	if err != nil {
+		fmt.Println("DEPENDENCY ERR: h.utils.Chmod")
+		return err
+	}
+
 	return nil
 }
 

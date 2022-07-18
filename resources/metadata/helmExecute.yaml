@@ -294,6 +294,6 @@ spec:
   containers:
     - image: dtzar/helm-kubectl:3.8.0
       workingDir: /config
-      # options:
-        # - name: -u
-          # value: "0"
+      options:
+        - name: -u
+          value: "0"
