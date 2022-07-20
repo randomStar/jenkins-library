@@ -148,6 +148,14 @@ func getFioriDeployStatement(
 	if err != nil {
 		return "", err
 	}
+	files, err := ioutil.ReadDir(".")
+	fmt.Println("xxxxxxxxxxx: contents here are:")
+	if err != nil {
+	return fmt.Errorf("cannot list directories")
+	}
+		for _, file := range files {
+        		fmt.Println(file.Name())
+        	}
 	cmd := []string{
 		"fiori",
 		"deploy",
