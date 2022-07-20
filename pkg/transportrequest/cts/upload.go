@@ -2,6 +2,7 @@ package cts
 
 import (
 	"fmt"
+	"io/ioutil"
 	"github.com/SAP/jenkins-library/pkg/command"
 	"github.com/SAP/jenkins-library/pkg/log"
 	"github.com/SAP/jenkins-library/pkg/piperutils"
