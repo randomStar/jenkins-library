@@ -81,10 +81,12 @@ def unstash(name, msg = "Unstash failed:") {
 
     def unstashedContent = []
     try {
-        echo "xxxxxxxxx unstashing content"
+        echo "xxxxxxxxx unstashing content before unstash"
         sh "ls -la"
         echo "Unstash content: ${name}"
         steps.unstash name
+        echo "xxxx: unstashing content after unstash a"
+         sh "ls -la"
         unstashedContent += name
     } catch (e) {
         echo "$msg $name (${e.getMessage()})"
