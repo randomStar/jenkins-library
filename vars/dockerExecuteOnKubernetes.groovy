@@ -428,15 +428,15 @@ private void unstashWorkspace(config, prefix) {
     try {
                 echo "yyyyy: Listing the content before unstash"
 
-def dir = new File(".")
-dir.eachFileRecurse (FileType.ANY) { file ->
+def dir1 = new File(".")
+dir1.eachFileRecurse (FileType.ANY) { file ->
   echo file
 }
         unstash "${prefix}-${config.uniqueId}"
         echo "xxxxxx: Listing the content after unstash"
 
-def dir = new File(".")
-dir.eachFileRecurse (FileType.ANY) { file ->
+def dir2 = new File(".")
+dir2.eachFileRecurse (FileType.ANY) { file ->
   echo file
 }
     } catch (AbortException | IOException e) {
