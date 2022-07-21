@@ -81,6 +81,8 @@ def unstash(name, msg = "Unstash failed:") {
 
     def unstashedContent = []
     try {
+        echo "xxxxxxxxx unstashing content"
+        sh "ls -la"
         echo "Unstash content: ${name}"
         steps.unstash name
         unstashedContent += name
