@@ -8,6 +8,7 @@ import com.sap.piper.JenkinsUtils
 import com.sap.piper.Utils
 import com.sap.piper.k8s.SystemEnv
 import com.sap.piper.JsonUtils
+import groovy.io.FileType
 
 import groovy.transform.Field
 import hudson.AbortException
@@ -425,7 +426,19 @@ private Map getSecurityContext(Map config) {
 
 private void unstashWorkspace(config, prefix) {
     try {
+                echo "yyyyy: Listing the content before unstash"
+
+def dir = new File(".")
+dir.eachFileRecurse (FileType.ANY) { file ->
+  echo file
+}
         unstash "${prefix}-${config.uniqueId}"
+        echo "xxxxxx: Listing the content after unstash"
+
+def dir = new File(".")
+dir.eachFileRecurse (FileType.ANY) { file ->
+  echo file
+}
     } catch (AbortException | IOException e) {
         echo "${e.getMessage()}\n${e.getCause()}"
     } catch (Throwable e) {
