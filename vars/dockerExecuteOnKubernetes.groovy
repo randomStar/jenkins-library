@@ -428,11 +428,11 @@ private void unstashWorkspace(config, prefix) {
     try {
                 echo "yyyyy: Listing the content before unstash"
 
-               sh "ls -laR"
+               sh "ls -la"
         unstash "${prefix}-${config.uniqueId}"
         echo "xxxxxx: Listing the content after unstash"
 
-          sh "ls -laR"
+          sh "ls -la"
     } catch (AbortException | IOException e) {
         echo "${e.getMessage()}\n${e.getCause()}"
     } catch (Throwable e) {
