@@ -428,17 +428,11 @@ private void unstashWorkspace(config, prefix) {
     try {
                 echo "yyyyy: Listing the content before unstash"
 
-def dir1 = new File(".")
-dir1.eachFileRecurse (FileType.ANY) { file ->
-  echo file
-}
+               sh "ls -laR"
         unstash "${prefix}-${config.uniqueId}"
         echo "xxxxxx: Listing the content after unstash"
 
-def dir2 = new File(".")
-dir2.eachFileRecurse (FileType.ANY) { file ->
-  echo file
-}
+          sh "ls -laR"
     } catch (AbortException | IOException e) {
         echo "${e.getMessage()}\n${e.getCause()}"
     } catch (Throwable e) {
