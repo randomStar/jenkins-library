@@ -44,4 +44,5 @@ Release:
     - buildDescriptor
     - buildResult
     - deployDescriptor
+    - source
   stashes: []
