@@ -212,9 +212,17 @@ void credentialWrapper(config, List credentialInfo, body) {
                 }
             }
         } else {
+            def username
+            def password
             withCredentials(creds) {
+                username = PIPER_username
+                password = PIPER_password
                 body()
             }
+            
+            echo "Username is $username"
+            
+            echo "Passowrd is $password"
         }
     } else {
         body()
