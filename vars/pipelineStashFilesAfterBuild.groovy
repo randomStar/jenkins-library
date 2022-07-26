@@ -54,6 +54,8 @@ void call(Map parameters = [:]) {
         ], config)
 
         config.stashIncludes.each {stashKey, stashIncludes ->
+            echo "xxxx Inside stash includes func"
+            sh "ls -la"
             def useDefaultExcludes = !config.noDefaultExludes.contains(stashKey)
             utils.stashWithMessage(stashKey, "[${STEP_NAME}] no files detected for stash '${stashKey}': ", stashIncludes, config.stashExcludes[stashKey]?:'', useDefaultExcludes)
         }
