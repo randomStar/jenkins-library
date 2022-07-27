@@ -439,8 +439,8 @@ private void unstashWorkspace(config, prefix) {
         echo "Unstash workspace failed with throwable ${e.getMessage()}"
         throw e
     } finally {
-        echo "invalidate stash ${prefix}-${config.uniqueId}"
-        stash name: "${prefix}-${config.uniqueId}", excludes: '**/*', allowEmpty: true
+        echo "invalidate stash disabled"
+       // stash name: "${prefix}-${config.uniqueId}", excludes: '**/*', allowEmpty: true
     }
 }
 
