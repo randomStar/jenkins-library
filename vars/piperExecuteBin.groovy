@@ -288,7 +288,7 @@ void handleErrorDetails(String stepName, Closure body) {
     }
 }
 
-static void checkIfStepActive(Script script, String piperGoPath, String stageConfig, String stepOutputFile, String stageOutputFile) {
+static void checkIfStepActive(Script script, String piperGoPath, String stageConfig, String stepOutputFile, String stageOutputFile, String stage, String step) {
     (new PiperGoUtils(script, new Utils())).unstashPiperBin()
-    script.sh(returnStdout: true, script: "${piperGoPath} checkIfStepActive --stageConfig ${stageConfig} --useV1 --stageOutputFile ${stageOutputFile} --stepOutputFile ${stepOutputFile} --step _")
+    script.sh(returnStdout: true, script: "${piperGoPath} checkIfStepActive --stageConfig ${stageConfig} --useV1 --stageOutputFile ${stageOutputFile} --stepOutputFile ${stepOutputFile} --stage ${stage} --step ${step}")
 }

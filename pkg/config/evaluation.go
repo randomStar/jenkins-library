@@ -7,6 +7,7 @@ import (
 	"path"
 	"strings"
 
+	"github.com/SAP/jenkins-library/pkg/log"
 	"github.com/SAP/jenkins-library/pkg/orchestrator"
 	"github.com/SAP/jenkins-library/pkg/piperutils"
 
@@ -104,7 +105,7 @@ func (r *RunConfigV1) evaluateConditionsV1(config *Config, filters map[string]St
 }
 
 func (s *StepCondition) evaluateV1(config StepConfig, utils piperutils.FileUtils, stepName string, envRootPath string) (bool, error) {
-
+	log.Entry().Infof("Reporting live from evaluateV1 with stepName %v and stepConfig %v", stepName, config)
 	// only the first condition will be evaluated.
 	// if multiple conditions should be checked they need to provided via the Conditions list
 	if s.Config != nil {
