@@ -265,6 +265,13 @@ func (exec *Execute) FindPackageJSONFilesWithScript(packageJSONFiles []string, s
 				packagesWithScript = append(packagesWithScript, file)
 				log.Entry().Info("Discovered " + script + " script in " + file)
 			}
+			else {
+				log.Entry().Info("xxxxx: Did not discover " + script + " script in " + file)
+			
+			}
+		}
+		else {
+			log.Entry().Info("xxxx: package json scripts not found" )
 		}
 	}
 	return packagesWithScript, nil
