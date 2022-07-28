@@ -287,3 +287,8 @@ void handleErrorDetails(String stepName, Closure body) {
         error "[${stepName}] Step execution failed. Error: ${ex}, please see log file for more details."
     }
 }
+
+static void checkIfStepActive(Script script, String piperGoPath, String stageConfig, String stageOutputFile) {
+    (new PiperGoUtils(script, new Utils())).unstashPiperBin()
+    script.sh(returnStdout: true, script: "${piperGoPath} checkIfStepActive --stageConfig ${stageConfig} --useV1 --stageOutputFile ${stageOutputFile} --step _")
+}
