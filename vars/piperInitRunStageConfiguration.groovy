@@ -58,7 +58,7 @@ void call(Map parameters = [:]) {
         .use()
     // Ashly
     String piperGoPath = parameters?.piperGoPath ?: './piper'
-    piperExecuteBin.checkIfStepActive(script,piperGoPath,congig.stageConfigResource,".pipeline/step_out.json",".pipeline/stage_out.json","dummy","dummy")
+    piperExecuteBin.checkIfStepActive(script,piperGoPath,config.stageConfigResource,".pipeline/step_out.json",".pipeline/stage_out.json","dummy","dummy")
     config.stages = (readYaml(text: libraryResource(config.stageConfigResource))).stages
     //handling of stage and step activation
     config.stages.each {stage ->
