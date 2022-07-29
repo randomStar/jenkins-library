@@ -132,6 +132,7 @@ func (s *StepCondition) evaluateV1(config StepConfig, utils piperutils.FileUtils
 
 	if len(s.FilePattern) > 0 {
 		files, err := utils.Glob(s.FilePattern)
+		fmt.Printf("Files %v...errr %v", files, err)
 		if err != nil {
 			return false, errors.Wrap(err, "failed to check filePattern condition")
 		}
