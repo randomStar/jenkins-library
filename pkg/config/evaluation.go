@@ -105,7 +105,7 @@ func (r *RunConfigV1) evaluateConditionsV1(config *Config, filters map[string]St
 }
 
 func (s *StepCondition) evaluateV1(config StepConfig, utils piperutils.FileUtils, stepName string, envRootPath string) (bool, error) {
-	log.Entry().Infof("Reporting live from evaluateV1 with stepName %v and stepConfig %v", stepName, config)
+	log.Entry().Infof("Reporting live from evaluateV1 with stepName %v", stepName)
 	// only the first condition will be evaluated.
 	// if multiple conditions should be checked they need to provided via the Conditions list
 	if s.Config != nil {
@@ -124,7 +124,7 @@ func (s *StepCondition) evaluateV1(config StepConfig, utils piperutils.FileUtils
 			return false, nil
 		}
 	}
-
+	log.Entry().Infof("stepName %v  s.ConfigKey %v", stepName, s.ConfigKey)
 	if len(s.ConfigKey) > 0 {
 		configKey := strings.Split(s.ConfigKey, "/")
 		return checkConfigKeyV1(config.Config, configKey)

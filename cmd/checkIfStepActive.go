@@ -64,9 +64,6 @@ func checkIfStepActive(utils piperutils.FileUtils) error {
 		return errors.New("stage name must not be empty")
 	}
 	var pConfig config.Config
-
-	// Ashly testing hardcode stepNames
-	checkStepActiveOptions.stepNames = []string{"sapCallStagingService", "golang", "hadolint"}
 	// load project config and defaults
 	projectConfig, err := initializeConfig(&pConfig)
 	if err != nil {
