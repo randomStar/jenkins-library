@@ -18,12 +18,10 @@ type checkStepActiveCommandOptions struct {
 	openFile        func(s string, t map[string]string) (io.ReadCloser, error)
 	stageConfigFile string
 	stepName        string
-	stepNames       []string
 	stageName       string
 	v1Active        bool
 	stageOutputFile string
 	stepOutputFile  string
-	activeStepsMap  map[string]interface{}
 }
 
 var checkStepActiveOptions checkStepActiveCommandOptions
@@ -64,6 +62,7 @@ func checkIfStepActive(utils piperutils.FileUtils) error {
 		return errors.New("stage name must not be empty")
 	}
 	var pConfig config.Config
+
 	// load project config and defaults
 	projectConfig, err := initializeConfig(&pConfig)
 	if err != nil {
@@ -143,7 +142,6 @@ func addCheckStepActiveFlags(cmd *cobra.Command) {
 	cmd.Flags().StringVar(&checkStepActiveOptions.stageConfigFile, "stageConfig", ".resources/piper-stage-config.yml",
 		"Default config of piper pipeline stages")
 	cmd.Flags().StringVar(&checkStepActiveOptions.stepName, "step", "", "Name of the step being checked")
-	cmd.Flags().StringSliceVar(&checkStepActiveOptions.stepNames, "stepNames", []string{}, "List of steps to be checked in a stage.")
 	cmd.Flags().StringVar(&checkStepActiveOptions.stageName, "stage", "", "Name of the stage in which contains the step being checked")
 	cmd.Flags().BoolVar(&checkStepActiveOptions.v1Active, "useV1", false, "Use new CRD-style stage configuration")
 	cmd.Flags().StringVar(&checkStepActiveOptions.stageOutputFile, "stageOutputFile", "", "Defines a file path. If set, the stage output will be written to the defined file")

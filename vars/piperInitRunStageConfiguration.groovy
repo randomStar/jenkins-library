@@ -56,14 +56,15 @@ void call(Map parameters = [:]) {
         .mixin(parameters, PARAMETER_KEYS)
         .withMandatoryProperty('stageConfigResource')
         .use()
-    // Ashly
+
+    // Go logic to check if the step is active
     String piperGoPath = parameters?.piperGoPath ?: './piper'
-    writeFile(file: "stage_conditions.yaml", text: libraryResource(config.stageConfigResource))
-    piperExecuteBin.checkIfStepActive(script,piperGoPath,"stage_conditions.yaml",".pipeline/step_out.json",".pipeline/stage_out.json","dummy","dummy")
-    echo "Came back"
+    writeFile(file: ".pipeline/stage_conditions.yaml", text: libraryResource(config.stageConfigResource))
+    piperExecuteBin.checkIfStepActive(script,piperGoPath,".pipeline/stage_conditions.yaml",".pipeline/step_out.json",".pipeline/stage_out.json","dummy","dummy")
+
+    // below lines to be deleted
     config.stages = (readYaml(text: libraryResource(config.stageConfigResource))).stages
 
-    echo "${config.stages}"
     //handling of stage and step activation
     config.stages.each {stage ->
 

@@ -266,7 +266,6 @@ func AccessTokensFromEnvJSON(env string) []string {
 // Log output needs to be suppressed via outputToLog by the getConfig step.
 func initStageName(outputToLog bool) {
 	var stageNameSource string
-	log.Entry().Infof("Using stageName 1 '%s' from %s", GeneralConfig.StageName, stageNameSource)
 	if outputToLog {
 		defer func() {
 			log.Entry().Infof("Using stageName '%s' from %s", GeneralConfig.StageName, stageNameSource)
@@ -287,7 +286,7 @@ func initStageName(outputToLog bool) {
 		stageNameSource = "env variable"
 		GeneralConfig.StageName = provider.GetStageName()
 	}
-	log.Entry().Infof("Using stageName 2 '%s' from %s", GeneralConfig.StageName, stageNameSource)
+
 	if len(GeneralConfig.ParametersJSON) == 0 {
 		return
 	}
