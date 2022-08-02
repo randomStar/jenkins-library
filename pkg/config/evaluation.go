@@ -124,7 +124,7 @@ func (s *StepCondition) evaluateV1(config StepConfig, utils piperutils.FileUtils
 			return false, nil
 		}
 	}
-	log.Entry().Infof("stepName %v  s.ConfigKey %v", stepName, s.ConfigKey)
+
 	if len(s.ConfigKey) > 0 {
 		configKey := strings.Split(s.ConfigKey, "/")
 		return checkConfigKeyV1(config.Config, configKey)
@@ -194,6 +194,7 @@ func (s *StepCondition) evaluateV1(config StepConfig, utils piperutils.FileUtils
 	}
 }
 
+<<<<<<< HEAD
 func checkConfigKeyV1(config map[string]interface{}, configKey []string) (bool, error) {
 	value, ok := config[configKey[0]]
 	if len(configKey) == 1 {
@@ -204,6 +205,29 @@ func checkConfigKeyV1(config map[string]interface{}, configKey []string) (bool, 
 		return false, nil
 	}
 	return checkConfigKeyV1(castedValue, configKey[1:])
+=======
+func checkConfigKeyV1(key string, config StepConfig) (bool, error) {
+	if strings.Contains(key, "/") {
+		listKeys := strings.Split(key, "/")
+		var raw interface{} = config.Config
+		var ok bool
+		lastIndex := len(listKeys) - 1
+		for i, key := range listKeys {
+			currentConfig, casted := raw.(map[string]interface{})
+			if !casted {
+				break
+			}
+			if raw, ok = currentConfig[key]; ok && lastIndex == i {
+				return true, nil
+			}
+		}
+	} else {
+		if configValue := config.Config[key]; configValue != nil {
+			return true, nil
+		}
+	}
+	return false, nil
+>>>>>>> e6a5cf19 (fix checkIfStepActive for ConfigKey)
 }
 
 // EvaluateConditions validates stage conditions and updates runSteps in runConfig
