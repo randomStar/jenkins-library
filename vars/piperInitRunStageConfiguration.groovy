@@ -125,6 +125,8 @@ void call(Map parameters = [:]) {
         echo "[${STEP_NAME}] Debug - Run Stage Configuration: ${script.commonPipelineEnvironment.configuration.runStage}"
         echo "[${STEP_NAME}] Debug - Run Step Configuration: ${script.commonPipelineEnvironment.configuration.runStep}"
     }
+    script.writeJSON file: ".pipeline/groovy_stage.out", json: script.commonPipelineEnvironment.configuration.runStage
+    script.writeJSON file: ".pipeline/groovy_step.out", json: script.commonPipelineEnvironment.configuration.runStep
 }
 
 private static boolean checkExtensionExists(Script script, Map config, String stageName) {
