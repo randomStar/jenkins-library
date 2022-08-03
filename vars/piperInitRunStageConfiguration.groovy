@@ -62,71 +62,71 @@ void call(Map parameters = [:]) {
     writeFile(file: ".pipeline/stage_conditions.yaml", text: libraryResource(config.stageConfigResource))
     piperExecuteBin.checkIfStepActive(script,piperGoPath,".pipeline/stage_conditions.yaml",".pipeline/step_out.json",".pipeline/stage_out.json","dummy","dummy")
 
-    // below lines to be deleted
-    config.stages = (readYaml(text: libraryResource(config.stageConfigResource))).stages
+    // // below lines to be deleted
+    // config.stages = (readYaml(text: libraryResource(config.stageConfigResource))).stages
 
-    //handling of stage and step activation
-    config.stages.each {stage ->
+    // //handling of stage and step activation
+    // config.stages.each {stage ->
 
-        String currentStage = stage.getKey()
-        script.commonPipelineEnvironment.configuration.runStep[currentStage] = [:]
+    //     String currentStage = stage.getKey()
+    //     script.commonPipelineEnvironment.configuration.runStep[currentStage] = [:]
 
-        // Always test step conditions in order to fill runStep[currentStage] map
-        boolean anyStepConditionTrue = false
-        stage.getValue().stepConditions?.each {step ->
-            boolean stepActive = false
-            String stepName = step.getKey()
-            step.getValue().each {condition ->
-                Map stepConfig = script.commonPipelineEnvironment.getStepConfiguration(stepName, currentStage)
-                switch(condition.getKey()) {
-                    case 'config':
-                        stepActive = stepActive || checkConfig(condition, stepConfig)
-                        break
-                    case 'configKeys':
-                        stepActive = stepActive || checkConfigKeys(condition, stepConfig)
-                        break
-                    case 'filePatternFromConfig':
-                        stepActive = stepActive || checkForFilesWithPatternFromConfig(script, condition, stepConfig)
-                        break
-                    case 'filePattern':
-                        stepActive = stepActive || checkForFilesWithPattern(script, condition)
-                        break
-                    case 'npmScripts':
-                        stepActive = stepActive || checkForNpmScriptsInPackages(script, condition)
-                        break
-                }
-            }
-            script.commonPipelineEnvironment.configuration.runStep[currentStage][stepName] = stepActive
+    //     // Always test step conditions in order to fill runStep[currentStage] map
+    //     boolean anyStepConditionTrue = false
+    //     stage.getValue().stepConditions?.each {step ->
+    //         boolean stepActive = false
+    //         String stepName = step.getKey()
+    //         step.getValue().each {condition ->
+    //             Map stepConfig = script.commonPipelineEnvironment.getStepConfiguration(stepName, currentStage)
+    //             switch(condition.getKey()) {
+    //                 case 'config':
+    //                     stepActive = stepActive || checkConfig(condition, stepConfig)
+    //                     break
+    //                 case 'configKeys':
+    //                     stepActive = stepActive || checkConfigKeys(condition, stepConfig)
+    //                     break
+    //                 case 'filePatternFromConfig':
+    //                     stepActive = stepActive || checkForFilesWithPatternFromConfig(script, condition, stepConfig)
+    //                     break
+    //                 case 'filePattern':
+    //                     stepActive = stepActive || checkForFilesWithPattern(script, condition)
+    //                     break
+    //                 case 'npmScripts':
+    //                     stepActive = stepActive || checkForNpmScriptsInPackages(script, condition)
+    //                     break
+    //             }
+    //         }
+    //         script.commonPipelineEnvironment.configuration.runStep[currentStage][stepName] = stepActive
 
-            anyStepConditionTrue = anyStepConditionTrue || stepActive
-        }
+    //         anyStepConditionTrue = anyStepConditionTrue || stepActive
+    //     }
 
-        Map stageConfig = ConfigurationHelper.newInstance(this)
-            .loadStepDefaults([:], currentStage)
-            .mixinStageConfig(script.commonPipelineEnvironment, currentStage)
-            .use()
+    //     Map stageConfig = ConfigurationHelper.newInstance(this)
+    //         .loadStepDefaults([:], currentStage)
+    //         .mixinStageConfig(script.commonPipelineEnvironment, currentStage)
+    //         .use()
 
-        boolean runStage
-        if (stageConfig.runInAllBranches == false && (config.productiveBranch != env.BRANCH_NAME)) {
-            runStage = false
-        } else if (ConfigurationLoader.stageConfiguration(script, currentStage)) {
-            //activate stage if stage configuration is available
-            runStage = true
-        } else if (stage.getValue().extensionExists == true) {
-            runStage = anyStepConditionTrue || checkExtensionExists(script, config, currentStage)
-        } else {
-            runStage = anyStepConditionTrue
-        }
+    //     boolean runStage
+    //     if (stageConfig.runInAllBranches == false && (config.productiveBranch != env.BRANCH_NAME)) {
+    //         runStage = false
+    //     } else if (ConfigurationLoader.stageConfiguration(script, currentStage)) {
+    //         //activate stage if stage configuration is available
+    //         runStage = true
+    //     } else if (stage.getValue().extensionExists == true) {
+    //         runStage = anyStepConditionTrue || checkExtensionExists(script, config, currentStage)
+    //     } else {
+    //         runStage = anyStepConditionTrue
+    //     }
 
-        script.commonPipelineEnvironment.configuration.runStage[currentStage] = runStage
-    }
+    //     script.commonPipelineEnvironment.configuration.runStage[currentStage] = runStage
+    // }
+    script.commonPipelineEnvironment.configuration.runStage = script.readJSON file: ".pipeline/stage_out.json"
+    script.commonPipelineEnvironment.configuration.runStep = script.readJSON file: ".pipeline/step_out.json"
 
     if (config.verbose) {
         echo "[${STEP_NAME}] Debug - Run Stage Configuration: ${script.commonPipelineEnvironment.configuration.runStage}"
         echo "[${STEP_NAME}] Debug - Run Step Configuration: ${script.commonPipelineEnvironment.configuration.runStep}"
     }
-    script.writeJSON file: ".pipeline/groovy_stage.out", json: script.commonPipelineEnvironment.configuration.runStage
-    script.writeJSON file: ".pipeline/groovy_step.out", json: script.commonPipelineEnvironment.configuration.runStep
 }
 
 private static boolean checkExtensionExists(Script script, Map config, String stageName) {
