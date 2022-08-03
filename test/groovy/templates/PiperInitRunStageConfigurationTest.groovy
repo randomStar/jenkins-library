@@ -285,6 +285,7 @@ steps: {}
 
     @Test
     void testConditionFilePatternWithList() {
+        helper.registerAllowedMethod("writeFile", [Map.class], null)
         helper.registerAllowedMethod('libraryResource', [String.class], {s ->
             if(s == 'testDefault.yml') {
                 return '''
@@ -592,6 +593,7 @@ stages:
 
     @Test
     void testConditionOnlyProductiveBranchOnProductiveBranch() {
+        helper.registerAllowedMethod("writeFile", [Map.class], null)
         helper.registerAllowedMethod('libraryResource', [String.class], {s ->
             if(s == 'testDefault.yml') {
                 return '''
