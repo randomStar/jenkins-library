@@ -594,6 +594,17 @@ stages:
     @Test
     void testConditionOnlyProductiveBranchOnProductiveBranch() {
         helper.registerAllowedMethod("writeFile", [Map.class], null)
+
+        def piperBinStash = 'piper-bin'
+
+        // this mocks utils.unstash
+        helper.registerAllowedMethod("unstash", [String.class], { stashFileName ->
+            if (stashFileName != piperBinStash) {
+                return []
+            }
+            return [piperBinStash]
+        })
+
         helper.registerAllowedMethod('libraryResource', [String.class], {s ->
             if(s == 'testDefault.yml') {
                 return '''
