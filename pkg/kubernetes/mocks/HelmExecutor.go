@@ -52,7 +52,7 @@ func (_m *HelmExecutor) RunHelmLint() error {
 }
 
 // RunHelmPublish provides a mock function with given fields:
-func (_m *HelmExecutor) RunHelmPublish() error {
+func (_m *HelmExecutor) RunHelmPublish() (error, string) {
 	ret := _m.Called()
 
 	var r0 error
@@ -62,7 +62,7 @@ func (_m *HelmExecutor) RunHelmPublish() error {
 		r0 = ret.Error(0)
 	}
 
-	return r0
+	return r0, ""
 }
 
 // RunHelmTest provides a mock function with given fields:
