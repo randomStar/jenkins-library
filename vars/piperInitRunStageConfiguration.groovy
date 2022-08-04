@@ -51,8 +51,41 @@ void call(Map parameters = [:]) {
     script.commonPipelineEnvironment.configuration.runStage = script.readJSON file: ".pipeline/stage_out.json"
     script.commonPipelineEnvironment.configuration.runStep = script.readJSON file: ".pipeline/step_out.json"
 
+    // Retaining this groovy code as some additional checks for activating-deactivating a stage seems to be done.
+    Map stageConfig = ConfigurationHelper.newInstance(this)
+            .loadStepDefaults([:], currentStage)
+            .mixinStageConfig(script.commonPipelineEnvironment, currentStage)
+            .use()
+
+        boolean runStage
+        if (stageConfig.runInAllBranches == false && (config.productiveBranch != env.BRANCH_NAME)) {
+            runStage = false
+        } else if (ConfigurationLoader.stageConfiguration(script, currentStage)) {
+            //activate stage if stage configuration is available
+            runStage = true
+        } else if (stage.getValue().extensionExists == true) {
+            runStage =  checkExtensionExists(script, config, currentStage)
+        }
+
+        script.commonPipelineEnvironment.configuration.runStage[currentStage] = runStage
+
     if (config.verbose) {
         echo "[${STEP_NAME}] Debug - Run Stage Configuration: ${script.commonPipelineEnvironment.configuration.runStage}"
         echo "[${STEP_NAME}] Debug - Run Step Configuration: ${script.commonPipelineEnvironment.configuration.runStep}"
     }
+}
+
+private static boolean checkExtensionExists(Script script, Map config, String stageName) {
+    if (!script.piperStageWrapper.allowExtensions(script)) {
+        return false
+    }
+    // NOTE: These keys exist in "config" if they are configured in the general section of the project
+    // config or the defaults. However, in piperStageWrapper, these keys could also be configured for
+    // the step "piperStageWrapper" to be effective. Don't know if this should be considered here for consistency.
+    if (!config.globalExtensionsDirectory && !config.projectExtensionsDirectory) {
+        return false
+    }
+    def projectInterceptorFile = "${config.projectExtensionsDirectory}${stageName}.groovy"
+    def globalInterceptorFile = "${config.globalExtensionsDirectory}${stageName}.groovy"
+    return script.fileExists(projectInterceptorFile) || script.fileExists(globalInterceptorFile)
 }
