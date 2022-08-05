@@ -13,7 +13,20 @@ import groovy.transform.Field
      * Print more detailed information into the log.
      * @possibleValues `true`, `false`
      */
-    'verbose'
+    'verbose',
+    /**
+     * The branch used as productive branch, defaults to master.
+     */
+    'productiveBranch',
+    /**
+     * Location for individual stage extensions.
+     */
+    'projectExtensionsDirectory',
+    /**
+     * Location for global extensions.
+     */
+    'globalExtensionsDirectory'
+
 ]
 
 @Field Set STEP_CONFIG_KEYS = GENERAL_CONFIG_KEYS.plus([
@@ -45,29 +58,40 @@ void call(Map parameters = [:]) {
 
     // Go logic to check if the step is active
     String piperGoPath = parameters?.piperGoPath ?: './piper'
-    writeFile(file: ".pipeline/stage_conditions.yaml", text: libraryResource(config.stageConfigResource))
-    piperExecuteBin.checkIfStepActive(script,piperGoPath,".pipeline/stage_conditions.yaml",".pipeline/step_out.json",".pipeline/stage_out.json","_","_")
+    def resource = libraryResource(config.stageConfigResource)
+    config.stages = (readYaml(text: resource)).spec.stages
+    writeFile(file: ".pipeline/stage_conditions.yaml", text: resource)
+    def success = piperExecuteBin.checkIfStepActive(script,piperGoPath,".pipeline/stage_conditions.yaml",".pipeline/step_out.json",".pipeline/stage_out.json","_","_")
+    if (!success) {
+        throw new Exception("checkIfStepActive finished with error")
+    }
 
     script.commonPipelineEnvironment.configuration.runStage = script.readJSON file: ".pipeline/stage_out.json"
     script.commonPipelineEnvironment.configuration.runStep = script.readJSON file: ".pipeline/step_out.json"
 
     // Retaining this groovy code as some additional checks for activating-deactivating a stage seems to be done.
-    Map stageConfig = ConfigurationHelper.newInstance(this)
+    script.commonPipelineEnvironment.configuration.runStage.each {stage ->
+        String currentStage = stage.getKey()
+        Map stageConfig = ConfigurationHelper.newInstance(this)
             .loadStepDefaults([:], currentStage)
             .mixinStageConfig(script.commonPipelineEnvironment, currentStage)
             .use()
 
-        boolean runStage
+        boolean runStage = stage.getValue()
         if (stageConfig.runInAllBranches == false && (config.productiveBranch != env.BRANCH_NAME)) {
             runStage = false
         } else if (ConfigurationLoader.stageConfiguration(script, currentStage)) {
             //activate stage if stage configuration is available
             runStage = true
-        } else if (stage.getValue().extensionExists == true) {
-            runStage =  checkExtensionExists(script, config, currentStage)
+        } else {
+            def extensionExists = config.stages.find {e -> e.displayName == currentStage && e.extensionExists == true?true:false}
+            if (extensionExists != null) {
+                runStage = runStage || checkExtensionExists(script, config, currentStage)
+            }
         }
 
         script.commonPipelineEnvironment.configuration.runStage[currentStage] = runStage
+    }
 
     if (config.verbose) {
         echo "[${STEP_NAME}] Debug - Run Stage Configuration: ${script.commonPipelineEnvironment.configuration.runStage}"

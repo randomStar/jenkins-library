@@ -10,6 +10,8 @@ import util.JenkinsLoggingRule
 import util.JenkinsReadYamlRule
 import util.JenkinsStepRule
 import util.Rules
+import util.JenkinsShellCallRule
+import com.sap.piper.PiperGoUtils
 
 import static org.hamcrest.Matchers.*
 import static org.junit.Assert.assertThat
@@ -19,15 +21,15 @@ class PiperInitRunStageConfigurationTest extends BasePiperTest {
     private JenkinsLoggingRule jlr = new JenkinsLoggingRule(this)
     private JenkinsReadYamlRule jryr = new JenkinsReadYamlRule(this)
     private ExpectedException thrown = new ExpectedException()
-
+    private JenkinsShellCallRule shellCallRule = new JenkinsShellCallRule(this)
     @Rule
     public RuleChain rules = Rules
         .getCommonRules(this)
         .around(jryr)
         .around(thrown)
+        .around(shellCallRule)
         .around(jlr)
         .around(jsr)
-
     @Before
     void init()  {
 
@@ -43,12 +45,26 @@ class PiperInitRunStageConfigurationTest extends BasePiperTest {
                     return [].toArray()
             }
         })
+        PiperGoUtils.metaClass { unstashPiperBin = { println "" } }
     }
 
- 
+
     @Test
     void testVerboseOption() {
-        nullScript.commonPipelineEnvironment.configuration = [
+        shellCallRule.setReturnValue('./piper checkIfStepActive --stageConfig .pipeline/stage_conditions.yaml --useV1 --stageOutputFile .pipeline/stage_out.json --stepOutputFile .pipeline/step_out.json --stage _ --step _', 0)
+         helper.registerAllowedMethod("writeFile", [Map.class], null)
+         helper.registerAllowedMethod("readJSON", [Map.class], { m ->
+                     if (m.containsValue(".pipeline/stage_out.json")) {
+                         return ["testStage1":false]
+                     } else {
+                         if (m.containsValue(".pipeline/step_out.json")) {
+                             return  [:]
+                         }
+                         return [:]
+                     }
+                 })
+
+         nullScript.commonPipelineEnvironment.configuration = [
             general: [verbose: true],
             steps: [:],
             stages: [
@@ -68,10 +84,24 @@ class PiperInitRunStageConfigurationTest extends BasePiperTest {
             containsString('[piperInitRunStageConfiguration] Debug - Run Stage Configuration:'),
             containsString('[piperInitRunStageConfiguration] Debug - Run Step Configuration:')
         ))
+        assertThat(shellCallRule.shell, hasItem('./piper checkIfStepActive --stageConfig .pipeline/stage_conditions.yaml --useV1 --stageOutputFile .pipeline/stage_out.json --stepOutputFile .pipeline/step_out.json --stage _ --step _'))
     }
 
     @Test
     void testPiperInitDefault() {
+
+        shellCallRule.setReturnValue('./piper checkIfStepActive --stageConfig .pipeline/stage_conditions.yaml --useV1 --stageOutputFile .pipeline/stage_out.json --stepOutputFile .pipeline/step_out.json --stage _ --step _', 0)
+        helper.registerAllowedMethod("writeFile", [Map.class], null)
+        helper.registerAllowedMethod("readJSON", [Map.class], { m ->
+            if (m.containsValue(".pipeline/stage_out.json")) {
+                return ["Integration":true, "Acceptance":true]
+            } else {
+                if (m.containsValue(".pipeline/step_out.json")) {
+                    return  [ Integration: [test: true], Acceptance: [test: true]]
+                }
+                return [:]
+            }
+        })
 
         helper.registerAllowedMethod("findFiles", [Map.class], { map -> [].toArray() })
 
@@ -93,19 +123,36 @@ class PiperInitRunStageConfigurationTest extends BasePiperTest {
 
         assertThat(nullScript.commonPipelineEnvironment.configuration.runStage.Acceptance, is(true))
         assertThat(nullScript.commonPipelineEnvironment.configuration.runStage.Integration, is(true))
+        assertThat(shellCallRule.shell, hasItem('./piper checkIfStepActive --stageConfig .pipeline/stage_conditions.yaml --useV1 --stageOutputFile .pipeline/stage_out.json --stepOutputFile .pipeline/step_out.json --stage _ --step _'))
 
     }
 
     @Test
     void testConditionOnlyProductiveBranchOnNonProductiveBranch() {
+        shellCallRule.setReturnValue('./piper checkIfStepActive --stageConfig .pipeline/stage_conditions.yaml --useV1 --stageOutputFile .pipeline/stage_out.json --stepOutputFile .pipeline/step_out.json --stage _ --step _', 0)
+        helper.registerAllowedMethod("writeFile", [Map.class], null)
+        helper.registerAllowedMethod("readJSON", [Map.class], { m ->
+                    if (m.containsValue(".pipeline/stage_out.json")) {
+                        return ["testStage1":true]
+                    } else {
+                        if (m.containsValue(".pipeline/step_out.json")) {
+                            return  [:]
+                        }
+                        return [:]
+                    }
+                })
+
         helper.registerAllowedMethod('libraryResource', [String.class], {s ->
             if(s == 'testDefault.yml') {
                 return '''
-stages:
-  testStage1:
-    stepConditions:
-      firstStep:
-        filePattern: \'**/conf.js\'
+spec:
+  stages:
+    - name: testStage1
+      displayName: testStage1
+      steps:
+        - name: firstStep
+          conditions:
+          - filePattern: \'**/conf.js\'
 '''
             } else {
                 return '''
@@ -128,19 +175,35 @@ stages:
         )
 
         assertThat(nullScript.commonPipelineEnvironment.configuration.runStage.testStage1, is(false))
+        assertThat(shellCallRule.shell, hasItem('./piper checkIfStepActive --stageConfig .pipeline/stage_conditions.yaml --useV1 --stageOutputFile .pipeline/stage_out.json --stepOutputFile .pipeline/step_out.json --stage _ --step _'))
     }
 
     @Test
     void testConditionOnlyProductiveBranchOnProductiveBranch() {
         helper.registerAllowedMethod("writeFile", [Map.class], null)
+        helper.registerAllowedMethod("readJSON", [Map.class], { m ->
+                    if (m.containsValue(".pipeline/stage_out.json")) {
+                        return ["testStage1":true]
+                    } else {
+                        if (m.containsValue(".pipeline/step_out.json")) {
+                            return  ["testStage1":["firstStep":true]]
+                        }
+                        return [:]
+                    }
+                })
+        shellCallRule.setReturnValue('./piper checkIfStepActive --stageConfig .pipeline/stage_conditions.yaml --useV1 --stageOutputFile .pipeline/stage_out.json --stepOutputFile .pipeline/step_out.json --stage _ --step _', 0)
+
         helper.registerAllowedMethod('libraryResource', [String.class], {s ->
             if(s == 'testDefault.yml') {
                 return '''
-stages:
-  testStage1:
-    stepConditions:
-      firstStep:
-        filePattern: \'**/conf.js\'
+spec:
+  stages:
+    - name: testStage1
+      displayName: testStage1
+      steps:
+        - name: firstStep
+          conditions:
+            - filePattern: \'**/conf.js\'
 '''
             } else {
                 return '''
@@ -163,24 +226,44 @@ stages:
         )
 
         assertThat(nullScript.commonPipelineEnvironment.configuration.runStage.testStage1, is(true))
+        assertThat(shellCallRule.shell, hasItem('./piper checkIfStepActive --stageConfig .pipeline/stage_conditions.yaml --useV1 --stageOutputFile .pipeline/stage_out.json --stepOutputFile .pipeline/step_out.json --stage _ --step _'))
     }
 
     @Test
     void testStageExtensionExists() {
+        shellCallRule.setReturnValue('./piper checkIfStepActive --stageConfig .pipeline/stage_conditions.yaml --useV1 --stageOutputFile .pipeline/stage_out.json --stepOutputFile .pipeline/step_out.json --stage _ --step _', 0)
+        helper.registerAllowedMethod("writeFile", [Map.class], null)
+        helper.registerAllowedMethod("readJSON", [Map.class], { m ->
+                    if (m.containsValue(".pipeline/stage_out.json")) {
+                        return ["testStage1":false, "testStage2":false, "testStage3":false, "testStage4":false, "testStage5":false]
+                    } else {
+                        if (m.containsValue(".pipeline/step_out.json")) {
+                            return  [:]
+                        }
+                        return [:]
+                    }
+                })
+
         helper.registerAllowedMethod('libraryResource', [String.class], {s ->
             if(s == 'testDefault.yml') {
                 return '''
-stages:
-  testStage1:
-    extensionExists: true
-  testStage2:
-    extensionExists: true
-  testStage3:
-    extensionExists: false
-  testStage4:
-    extensionExists: 'false'
-  testStage5:
-    dummy: true
+spec:
+  stages:
+    - name: testStage1
+      displayName: testStage1
+      extensionExists: true
+    - name: testStage2
+      displayName: testStage2
+      extensionExists: true
+    - name: testStage3
+      displayName: testStage3
+      extensionExists: false
+    - name: testStage4
+      displayName: testStage4
+      extensionExists: 'false'
+    - name: testStage5
+      displayName: testStage5
+      dummy: true
 '''
             } else {
                 return '''
@@ -222,5 +305,6 @@ steps: {}
         assertThat(nullScript.commonPipelineEnvironment.configuration.runStage.testStage3, is(false))
         assertThat(nullScript.commonPipelineEnvironment.configuration.runStage.testStage4, is(false))
         assertThat(nullScript.commonPipelineEnvironment.configuration.runStage.testStage5, is(false))
+        assertThat(shellCallRule.shell, hasItem('./piper checkIfStepActive --stageConfig .pipeline/stage_conditions.yaml --useV1 --stageOutputFile .pipeline/stage_out.json --stepOutputFile .pipeline/step_out.json --stage _ --step _'))
     }
 }
