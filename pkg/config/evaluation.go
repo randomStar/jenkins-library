@@ -185,6 +185,21 @@ func (s *StepCondition) evaluateV1(config StepConfig, utils piperutils.FileUtils
 		return false, nil
 	}
 
+	if len(s.IsCommonPipelineEnvironmentFilled) > 0 {
+		var metadata StepData
+		metadata.Spec.Inputs.Parameters = []StepParameters{
+			{Name: stepName,
+				Type:        "interface",
+				ResourceRef: []ResourceReference{{Name: "commonPipelineEnvironment", Param: s.IsCommonPipelineEnvironmentFilled}},
+			},
+		}
+		resourceParams := metadata.GetResourceParameters(envRootPath, "commonPipelineEnvironment")
+		if resourceParams[stepName] != nil {
+			return true, nil
+		}
+		return false, nil
+	}
+
 	// needs to be checked last:
 	// if none of the other conditions matches, step will be active unless set to inactive
 	if s.Inactive == true {
