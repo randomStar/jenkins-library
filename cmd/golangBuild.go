@@ -496,7 +496,8 @@ func runGolangBuildPerArchitecture(config *golangBuildOptions, goModFile *modfil
 	}
 	utils.SetEnv(envVars)
 
-	buildOptions := []string{"build", "-trimpath"}
+	// buildOptions := []string{"build", "-trimpath"}
+	buildOptions := []string{"build"}
 
 	if len(config.Output) > 0 {
 		if len(config.Packages) > 1 {
