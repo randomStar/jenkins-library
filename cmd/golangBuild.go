@@ -253,6 +253,8 @@ func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomD
 
 		artifactVersion := config.ArtifactVersion
 
+		fmt.Println("artifactVersion", artifactVersion)
+
 		if len(artifactVersion) == 0 {
 			artifactOpts := versioning.Options{
 				VersioningScheme: "library",
@@ -265,6 +267,8 @@ func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomD
 			}
 
 			artifactVersion, err = artifact.GetVersion()
+
+			fmt.Println("artifactVersion", artifactVersion)
 
 			if err != nil {
 				return err
