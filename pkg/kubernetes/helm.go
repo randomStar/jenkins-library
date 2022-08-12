@@ -4,10 +4,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path/filepath"
 	"strings"
 
 	piperhttp "github.com/SAP/jenkins-library/pkg/http"
 	"github.com/SAP/jenkins-library/pkg/log"
+	"github.com/SAP/jenkins-library/pkg/piperenv"
 )
 
 // HelmExecutor is used for mock
@@ -23,10 +25,11 @@ type HelmExecutor interface {
 
 // HelmExecute struct
 type HelmExecute struct {
-	utils   DeployUtils
-	config  HelmExecuteOptions
-	verbose bool
-	stdout  io.Writer
+	utils    DeployUtils
+	config   HelmExecuteOptions
+	verbose  bool
+	rootPath string
+	stdout   io.Writer
 }
 
 // HelmExecuteOptions struct holds common parameters for functions RunHelm...
@@ -59,12 +62,13 @@ type HelmExecuteOptions struct {
 }
 
 // NewHelmExecutor creates HelmExecute instance
-func NewHelmExecutor(config HelmExecuteOptions, utils DeployUtils, verbose bool, stdout io.Writer) HelmExecutor {
+func NewHelmExecutor(config HelmExecuteOptions, utils DeployUtils, verbose bool, rootPath string, stdout io.Writer) HelmExecutor {
 	return &HelmExecute{
-		config:  config,
-		utils:   utils,
-		verbose: verbose,
-		stdout:  stdout,
+		config:   config,
+		utils:    utils,
+		verbose:  verbose,
+		rootPath: rootPath,
+		stdout:   stdout,
 	}
 }
 
@@ -414,6 +418,11 @@ func (h *HelmExecute) RunHelmPublish() error {
 	}
 
 	targetURL := fmt.Sprintf("%s%s%s", h.config.TargetRepositoryURL, separator, targetPath)
+
+	err = piperenv.SetResourceParameter(h.rootPath, "commonPipelineEnvironment", filepath.Join("custom", "chartPathURL"), targetURL)
+	if err != nil {
+		return fmt.Errorf("failed to write value to CPE: %w", err)
+	}
 
 	log.Entry().Infof("publishing artifact: %s", targetURL)
 
