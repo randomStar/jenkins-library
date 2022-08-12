@@ -44,7 +44,9 @@ type helmExecuteOptions struct {
 }
 
 type helmExecuteCommonPipelineEnvironment struct {
-	chartPathURL string
+	custom struct {
+		chartPathURL []string
+	}
 }
 
 func (p *helmExecuteCommonPipelineEnvironment) persist(path, resourceName string) {
@@ -53,7 +55,7 @@ func (p *helmExecuteCommonPipelineEnvironment) persist(path, resourceName string
 		name     string
 		value    interface{}
 	}{
-		{category: "", name: "chartPathURL", value: p.chartPathURL},
+		{category: "custom", name: "chartPathURL", value: p.custom.chartPathURL},
 	}
 
 	errCount := 0
@@ -534,7 +536,7 @@ func helmExecuteMetadata() config.StepData {
 						Name: "commonPipelineEnvironment",
 						Type: "piperEnvironment",
 						Parameters: []map[string]interface{}{
-							{"name": "chartPathURL"},
+							{"name": "custom/chartPathURL", "type": "[]string"},
 						},
 					},
 				},

@@ -302,4 +302,5 @@ spec:
       - name: commonPipelineEnvironment
         type: piperEnvironment
         params:
-          - name: chartPathURL
+          - name: custom/chartPathURL
+            type: "[]string"
