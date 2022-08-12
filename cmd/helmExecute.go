@@ -63,6 +63,7 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData,
 
 	helmExecutor := kubernetes.NewHelmExecutor(helmConfig, utils, GeneralConfig.Verbose, log.Writer())
 
+	commonPipelineEnvironment.chartPathURL = "chartPath url"
 	// error situations should stop execution through log.Entry().Fatal() call which leads to an os.Exit(1) in the end
 	if err := runHelmExecute(config, helmExecutor); err != nil {
 		log.Entry().WithError(err).Fatalf("step execution failed: %v", err)
