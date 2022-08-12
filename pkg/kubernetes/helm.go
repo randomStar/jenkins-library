@@ -19,7 +19,7 @@ type HelmExecutor interface {
 	RunHelmInstall() error
 	RunHelmUninstall() error
 	RunHelmTest() error
-	RunHelmPublish() error
+	RunHelmPublish() (string, error)
 	RunHelmDependency() error
 }
 
@@ -384,19 +384,19 @@ func (h *HelmExecute) RunHelmDependency() error {
 }
 
 //RunHelmPublish is used to upload a chart to a registry
-func (h *HelmExecute) RunHelmPublish() error {
+func (h *HelmExecute) RunHelmPublish() (string, error) {
 	err := h.runHelmInit()
 	if err != nil {
-		return fmt.Errorf("failed to execute deployments: %v", err)
+		return "", fmt.Errorf("failed to execute deployments: %v", err)
 	}
 
 	err = h.runHelmPackage()
 	if err != nil {
-		return fmt.Errorf("failed to execute deployments: %v", err)
+		return "", fmt.Errorf("failed to execute deployments: %v", err)
 	}
 
 	if len(h.config.TargetRepositoryURL) == 0 {
-		return fmt.Errorf("there's no target repository for helm chart publishing configured")
+		return "", fmt.Errorf("there's no target repository for helm chart publishing configured")
 	}
 
 	repoClientOptions := piperhttp.ClientOptions{
@@ -421,21 +421,21 @@ func (h *HelmExecute) RunHelmPublish() error {
 
 	err = piperenv.SetResourceParameter(h.rootPath, "commonPipelineEnvironment", filepath.Join("custom", "chartPathURL"), targetURL)
 	if err != nil {
-		return fmt.Errorf("failed to write value to CPE: %w", err)
+		return "", fmt.Errorf("failed to write value to CPE: %w", err)
 	}
 
 	log.Entry().Infof("publishing artifact: %s", targetURL)
 
 	response, err := h.utils.UploadRequest(http.MethodPut, targetURL, binary, "", nil, nil, "binary")
 	if err != nil {
-		return fmt.Errorf("couldn't upload artifact: %w", err)
+		return "", fmt.Errorf("couldn't upload artifact: %w", err)
 	}
 
 	if !(response.StatusCode == 200 || response.StatusCode == 201) {
-		return fmt.Errorf("couldn't upload artifact, received status code %d", response.StatusCode)
+		return "", fmt.Errorf("couldn't upload artifact, received status code %d", response.StatusCode)
 	}
 
-	return nil
+	return targetURL, nil
 }
 
 func (h *HelmExecute) runHelmCommand(helmParams []string) error {
