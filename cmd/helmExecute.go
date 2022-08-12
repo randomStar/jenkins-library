@@ -11,7 +11,7 @@ import (
 	"github.com/SAP/jenkins-library/pkg/versioning"
 )
 
-func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData) {
+func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData, commonPipelineEnvironment *helmExecuteCommonPipelineEnvironment) {
 	helmConfig := kubernetes.HelmExecuteOptions{
 		AdditionalParameters:      config.AdditionalParameters,
 		ChartPath:                 config.ChartPath,
