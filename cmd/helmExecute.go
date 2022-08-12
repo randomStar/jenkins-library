@@ -61,7 +61,7 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData,
 		log.Entry().WithError(err).Fatalf("failed to parse/render template: %v", err)
 	}
 
-	helmExecutor := kubernetes.NewHelmExecutor(helmConfig, utils, GeneralConfig.Verbose, GeneralConfig.EnvRootPath, log.Writer())
+	helmExecutor := kubernetes.NewHelmExecutor(helmConfig, utils, GeneralConfig.Verbose, log.Writer())
 
 	// error situations should stop execution through log.Entry().Fatal() call which leads to an os.Exit(1) in the end
 	if err := runHelmExecute(config, helmExecutor, commonPipelineEnvironment); err != nil {
