@@ -1,5 +1,6 @@
 package templates
 
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -22,6 +23,7 @@ class PiperInitRunStageConfigurationTest extends BasePiperTest {
     private JenkinsReadYamlRule jryr = new JenkinsReadYamlRule(this)
     private ExpectedException thrown = new ExpectedException()
     private JenkinsShellCallRule shellCallRule = new JenkinsShellCallRule(this)
+    private Object unstashPiperBin;
     @Rule
     public RuleChain rules = Rules
         .getCommonRules(this)
@@ -45,10 +47,15 @@ class PiperInitRunStageConfigurationTest extends BasePiperTest {
                     return [].toArray()
             }
         })
+        unstashPiperBin = PiperGoUtils.metaClass.unstashPiperBin
         PiperGoUtils.metaClass { unstashPiperBin = { println "" } }
         helper.registerAllowedMethod("writeFile", [Map.class], null)
     }
 
+   @After
+   void rollback() {
+        PiperGoUtils.metaClass.unstashPiperBin = unstashPiperBin
+   }
 
     @Test
     void testVerboseOption() {
