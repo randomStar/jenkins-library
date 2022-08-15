@@ -127,7 +127,7 @@ func runHelmExecuteDefault(config helmExecuteOptions, helmExecutor kubernetes.He
 			return fmt.Errorf("failed to execute helm publish: %v", err)
 		}
 		// test
-		targetURL = ""
+		// targetURL = ""
 		commonPipelineEnvironment.custom.remoteHelmChartPath = targetURL
 	}
 
