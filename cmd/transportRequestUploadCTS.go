@@ -72,7 +72,7 @@ func runTransportRequestUploadCTS(
 	cmd command.ShellRunner,
 	commonPipelineEnvironment *transportRequestUploadCTSCommonPipelineEnvironment) error {
 
-	log.Entry().Debugf("Entering 'runTransportRequestUpload' with config: %v", config)
+	log.Entry().Infof("Entering 'runTransportRequestUpload' with config: %v", config)
 
 	action.WithConnection(cts.Connection{
 		Endpoint: config.Endpoint,
