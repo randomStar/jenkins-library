@@ -73,6 +73,8 @@ func runTransportRequestUploadCTS(
 	commonPipelineEnvironment *transportRequestUploadCTSCommonPipelineEnvironment) error {
 
 	log.Entry().Infof("Entering 'runTransportRequestUpload' with config: %v", config)
+	
+		log.Entry().Infof("xxx 'trid' is: %v", config.TransportRequestID)
 
 	action.WithConnection(cts.Connection{
 		Endpoint: config.Endpoint,
@@ -93,10 +95,15 @@ func runTransportRequestUploadCTS(
 	action.WithTransportRequestID(config.TransportRequestID)
 	action.WithConfigFile(config.DeployConfigFile)
 	action.WithDeployUser(config.OsDeployUser)
+	
+	
+		log.Entry().Infof("yyyy 'trid' is: %v", config.TransportRequestID)
 
 	commonPipelineEnvironment.custom.transportRequestID = config.TransportRequestID
 
 	err := action.Perform(cmd)
+	
+		log.Entry().Infof("zzz 'trid' is: %v", config.TransportRequestID)
 
 	if err == nil {
 		log.Entry().Infof("Upload of application '%s' to CTS succeeded (TransportRequestId: '%s').",
