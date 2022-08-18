@@ -56,10 +56,10 @@ func helmExecute(config helmExecuteOptions, telemetryData *telemetry.CustomData,
 		helmConfig.PublishVersion = artifactInfo.Version
 	}
 
-	err = parseAndRenderCPETemplate(config, GeneralConfig.EnvRootPath, utils)
-	if err != nil {
-		log.Entry().WithError(err).Fatalf("failed to parse/render template: %v", err)
-	}
+	// err = parseAndRenderCPETemplate(config, GeneralConfig.EnvRootPath, utils)
+	// if err != nil {
+	// 	log.Entry().WithError(err).Fatalf("failed to parse/render template: %v", err)
+	// }
 
 	helmExecutor := kubernetes.NewHelmExecutor(helmConfig, utils, GeneralConfig.Verbose, log.Writer())
 
