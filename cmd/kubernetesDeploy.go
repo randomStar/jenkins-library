@@ -211,15 +211,35 @@ func runHelmDeploy(config kubernetesDeployOptions, utils kubernetes.DeployUtils,
 		log.Entry().WithError(err).Fatal("Helm upgrade call failed")
 	}
 
-	err = utils.Chmod("./helm/azure-demo-k8s-go/charts", 0777)
-	if err != nil {
-		fmt.Println("failed to change mod")
-	}
+	// before change mod
 	info, err := os.Stat("./helm/azure-demo-k8s-go/charts")
 	if err != nil {
 		fmt.Println("failed to get info")
 	}
 	fmt.Println("--- mod (charts) --- ", info.Mode())
+	info, err = os.Stat("./helm/azure-demo-k8s-go/charts/nginx-13.1.6.tgz")
+	if err != nil {
+		fmt.Println("failed to get info")
+	}
+	fmt.Println("--- mod (nginx-13.1.6.tgz) --- ", info.Mode())
+
+	// change mod
+	err = utils.Chmod("./helm/azure-demo-k8s-go/charts", 0777)
+	if err != nil {
+		fmt.Println("failed to change mod")
+	}
+
+	// after change mod
+	info, err = os.Stat("./helm/azure-demo-k8s-go/charts")
+	if err != nil {
+		fmt.Println("failed to get info")
+	}
+	fmt.Println("--- mod (charts) --- ", info.Mode())
+	info, err = os.Stat("./helm/azure-demo-k8s-go/charts/nginx-13.1.6.tgz")
+	if err != nil {
+		fmt.Println("failed to get info")
+	}
+	fmt.Println("--- mod (nginx-13.1.6.tgz) --- ", info.Mode())
 
 	// download and execute verification script
 	if len(config.VerificationScript) > 0 {
