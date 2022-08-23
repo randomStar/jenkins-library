@@ -211,6 +211,16 @@ func runHelmDeploy(config kubernetesDeployOptions, utils kubernetes.DeployUtils,
 		log.Entry().WithError(err).Fatal("Helm upgrade call failed")
 	}
 
+	err = utils.Chmod("./helm/azure-demo-k8s-go/charts", 0777)
+	if err != nil {
+		fmt.Println("failed to change mod")
+	}
+	info, err := os.Stat("./helm/azure-demo-k8s-go/charts")
+	if err != nil {
+		fmt.Println("failed to get info")
+	}
+	fmt.Println("--- mod (charts) --- ", info.Mode())
+
 	// download and execute verification script
 	if len(config.VerificationScript) > 0 {
 		log.Entry().Debugf("start running verification script %v", config.VerificationScript)
