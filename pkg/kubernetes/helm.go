@@ -385,7 +385,7 @@ func (h *HelmExecute) RunHelmDependency() error {
 	if err != nil {
 		fmt.Println("failed to get info")
 	}
-	fmt.Println(info.Mode().Perm().String())
+	fmt.Println("--- mod --- ", info.Mode())
 
 	return nil
 }
