@@ -376,6 +376,8 @@ func (h *HelmExecute) RunHelmDependency() error {
 		log.Entry().WithError(err).Fatal("Helm dependency call failed")
 	}
 
+	h.utils.Chmod(fmt.Sprintf("%s/charts/", h.config.ChartPath), 0777)
+
 	return nil
 }
 
