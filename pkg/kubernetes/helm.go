@@ -381,7 +381,11 @@ func (h *HelmExecute) RunHelmDependency() error {
 	if err != nil {
 		fmt.Println("failed to change mod")
 	}
-	info, err := os.Stat("./helm/azure-demo-k8s-go/charts")
+	err = h.utils.Chmod("./helm/azure-demo-k8s-go/charts/nginx-13.1.6.tgz", 0777)
+	if err != nil {
+		fmt.Println("failed to change mod")
+	}
+	info, err := os.Stat("./helm/azure-demo-k8s-go/charts/nginx-13.1.6.tgz")
 	if err != nil {
 		fmt.Println("failed to get info")
 	}
