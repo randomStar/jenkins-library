@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 
 	piperhttp "github.com/SAP/jenkins-library/pkg/http"
@@ -377,20 +376,20 @@ func (h *HelmExecute) RunHelmDependency() error {
 		log.Entry().WithError(err).Fatal("Helm dependency call failed")
 	}
 
-	err := h.utils.Chmod("./helm/azure-demo-k8s-go/charts", 0777)
-	if err != nil {
-		fmt.Println("failed to change mod")
-	}
+	// err := h.utils.Chmod("./helm/azure-demo-k8s-go/charts", 0777)
+	// if err != nil {
+	// 	fmt.Println("failed to change mod")
+	// }
 	// err = h.utils.Chmod("./helm/azure-demo-k8s-go/charts/nginx-13.1.6.tgz", 0777)
 	// if err != nil {
 	// 	fmt.Println("failed to change mod")
 	// }
 	// info, err := os.Stat("./helm/azure-demo-k8s-go/charts/nginx-13.1.6.tgz")
-	info, err := os.Stat("./helm/azure-demo-k8s-go/charts")
-	if err != nil {
-		fmt.Println("failed to get info")
-	}
-	fmt.Println("--- mod (charts) --- ", info.Mode())
+	// info, err := os.Stat("./helm/azure-demo-k8s-go/charts")
+	// if err != nil {
+	// 	fmt.Println("failed to get info")
+	// }
+	// fmt.Println("--- mod (charts) --- ", info.Mode())
 
 	return nil
 }
