@@ -372,6 +372,10 @@ func (h *HelmExecute) RunHelmDependency() error {
 		helmParams = append(helmParams, h.config.AdditionalParameters...)
 	}
 
+	// ******
+
+	// ******
+
 	if err := h.runHelmCommand(helmParams); err != nil {
 		log.Entry().WithError(err).Fatal("Helm dependency call failed")
 	}

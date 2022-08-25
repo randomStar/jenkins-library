@@ -528,11 +528,19 @@ func propagateVersion(config *artifactPrepareVersionOptions, utils artifactPrepa
 			// Make sure that version type fits to target artifact
 			descriptorVersion := version
 			if config.VersioningType == "cloud" || config.VersioningType == "cloud_noTag" {
+				// ****** {{.Version}}{{if .Timestamp}}-{{.Timestamp}}{{if .CommitID}}+{{.CommitID}}{{end}}{{end}}
 				descriptorVersion, err = calculateCloudVersion(targetArtifact, config, version, gitCommitID, now)
 				if err != nil {
 					return err
 				}
 			}
+
+			// ******
+			if targetTool == "helm" {
+				descriptorVersion = strings.ReplaceAll(descriptorVersion, "+", "_")
+			}
+			// ******
+
 			err = targetArtifact.SetVersion(descriptorVersion)
 			if err != nil {
 				return fmt.Errorf("failed to set additional target version for '%v': %w", targetTool, err)
