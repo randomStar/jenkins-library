@@ -536,9 +536,9 @@ func propagateVersion(config *artifactPrepareVersionOptions, utils artifactPrepa
 			}
 
 			// ******
-			if targetTool == "helm" {
-				descriptorVersion = strings.ReplaceAll(descriptorVersion, "+", "_")
-			}
+			// if targetTool == "helm" {
+			// 	descriptorVersion = strings.ReplaceAll(descriptorVersion, "+", "_")
+			// }
 			// ******
 
 			err = targetArtifact.SetVersion(descriptorVersion)
