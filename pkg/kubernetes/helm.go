@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 
 	piperhttp "github.com/SAP/jenkins-library/pkg/http"
@@ -403,11 +405,6 @@ func (h *HelmExecute) RunHelmDependency() error {
 	// }
 	// fmt.Println("--- mod (nginx-13.1.6.tgz) --- ", info.Mode())
 	// ******
-
-	if err := h.runHelmCommand(helmParams); err != nil {
-		log.Entry().WithError(err).Fatal("Helm dependency call failed")
-	}
-
 	// ******
 	// info, err := os.Stat("./helm/azure-demo-k8s-go/charts")
 	// if err != nil {
@@ -415,6 +412,20 @@ func (h *HelmExecute) RunHelmDependency() error {
 	// }
 	// fmt.Println("--- mod (charts) --- ", info.Mode())
 	// ******
+
+	// ******
+	//
+	path := strings.TrimLeft(h.config.ChartPath, "/")
+	err := os.MkdirAll(filepath.Join(path, "charts"), 0755)
+	// err = h.utils.MkdirAll()
+	if err != nil {
+		return fmt.Errorf("failed to create a folder: %v", err)
+	}
+	// ******
+
+	if err := h.runHelmCommand(helmParams); err != nil {
+		log.Entry().WithError(err).Fatal("Helm dependency call failed")
+	}
 
 	return nil
 }
