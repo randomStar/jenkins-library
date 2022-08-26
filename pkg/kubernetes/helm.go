@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 	"strings"
 
 	piperhttp "github.com/SAP/jenkins-library/pkg/http"
@@ -375,16 +374,16 @@ func (h *HelmExecute) RunHelmDependency() error {
 
 	// ******
 	// before change mod
-	info, err := os.Stat("./helm/azure-demo-k8s-go/charts")
-	if err != nil {
-		fmt.Println("failed to get info")
-	}
-	fmt.Println("--- mod (charts) --- ", info.Mode())
-	info, err = os.Stat("./helm/azure-demo-k8s-go/charts/nginx-13.1.6.tgz")
-	if err != nil {
-		fmt.Println("failed to get info")
-	}
-	fmt.Println("--- mod (nginx-13.1.6.tgz) --- ", info.Mode())
+	// info, err := os.Stat("./helm/azure-demo-k8s-go/charts")
+	// if err != nil {
+	// 	fmt.Println("failed to get info")
+	// }
+	// fmt.Println("--- mod (charts) --- ", info.Mode())
+	// info, err = os.Stat("./helm/azure-demo-k8s-go/charts/nginx-13.1.6.tgz")
+	// if err != nil {
+	// 	fmt.Println("failed to get info")
+	// }
+	// fmt.Println("--- mod (nginx-13.1.6.tgz) --- ", info.Mode())
 
 	// // change mod
 	// err = utils.Chmod("./helm/azure-demo-k8s-go/charts", 0777)
@@ -410,11 +409,11 @@ func (h *HelmExecute) RunHelmDependency() error {
 	}
 
 	// ******
-	info, err = os.Stat("./helm/azure-demo-k8s-go/charts")
-	if err != nil {
-		fmt.Println("failed to get info")
-	}
-	fmt.Println("--- mod (charts) --- ", info.Mode())
+	// info, err := os.Stat("./helm/azure-demo-k8s-go/charts")
+	// if err != nil {
+	// 	fmt.Println("failed to get info")
+	// }
+	// fmt.Println("--- mod (charts) --- ", info.Mode())
 	// ******
 
 	return nil
