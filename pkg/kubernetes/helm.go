@@ -376,7 +376,7 @@ func (h *HelmExecute) RunHelmDependency() error {
 		log.Entry().WithError(err).Fatal("Helm dependency call failed")
 	}
 
-	err := h.utils.Chmod("./helm/azure-demo-k8s-go/charts", 0766)
+	err := h.utils.Chmod("./helm/azure-demo-k8s-go/charts", 0777)
 	if err != nil {
 		fmt.Println("failed to change permissions: %w", err)
 	}
