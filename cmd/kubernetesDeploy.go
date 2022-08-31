@@ -204,6 +204,8 @@ func runHelmDeploy(config kubernetesDeployOptions, utils kubernetes.DeployUtils,
 		upgradeParams = append(upgradeParams, config.AdditionalParameters...)
 	}
 
+	// helm upgrade test-test-3 ./helm/azure-demo-k8s-go --values ./helm/azure-demo-k8s-go/values_release.yaml  --install --create-namespace --dependency-update
+
 	utils.Stdout(stdout)
 	log.Entry().Info("Calling helm upgrade ...")
 	log.Entry().Debugf("Helm parameters %v", upgradeParams)

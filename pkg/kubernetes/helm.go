@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path/filepath"
 	"strings"
 
 	piperhttp "github.com/SAP/jenkins-library/pkg/http"
@@ -130,6 +131,8 @@ func (h *HelmExecute) RunHelmUpgrade() error {
 		h.config.DeploymentName,
 	}
 
+	// helm upgrade deploymentName ./helm/azure-demo-k8s ... --install
+	// helm upgrade deploymentName bitnami ... --install
 	if len(h.config.ChartPath) == 0 {
 		if err := h.runHelmAdd(); err != nil {
 			return fmt.Errorf("failed to add a chart repository: %v", err)
@@ -376,10 +379,12 @@ func (h *HelmExecute) RunHelmDependency() error {
 		log.Entry().WithError(err).Fatal("Helm dependency call failed")
 	}
 
-	err := h.utils.Chmod("./helm/azure-demo-k8s-go/charts", 0777)
+	// ******
+	err := h.utils.Chmod(filepath.Join(h.config.ChartPath, "charts"), 0644)
 	if err != nil {
 		fmt.Println("failed to change permissions: %w", err)
 	}
+	// ******
 
 	return nil
 }
