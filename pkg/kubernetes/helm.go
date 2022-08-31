@@ -380,7 +380,7 @@ func (h *HelmExecute) RunHelmDependency() error {
 	}
 
 	// ******
-	err := h.utils.Chmod(filepath.Join(h.config.ChartPath, "charts"), 0764)
+	err := h.utils.Chmod(filepath.Join(h.config.ChartPath, "charts"), 0007)
 	if err != nil {
 		fmt.Println("failed to change permissions: %w", err)
 	}
