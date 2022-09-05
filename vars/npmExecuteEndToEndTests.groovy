@@ -112,7 +112,7 @@ void call(Map parameters = [:]) {
                 utils.unstashStageFiles(script, stageName)
                 try {
                     withCredentials(credentials) {
-                        List scriptOptions = ["--launchUrl=${appUrl.url}"]
+                        List scriptOptions = ["--baseUrl=${appUrl.url}"]
                         if (appUrl.parameters) {
                             if (appUrl.parameters instanceof List) {
                                 scriptOptions = scriptOptions + appUrl.parameters
