@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"path/filepath"
 	"strings"
 
 	piperhttp "github.com/SAP/jenkins-library/pkg/http"
@@ -378,12 +379,17 @@ func (h *HelmExecute) RunHelmDependency() error {
 		log.Entry().WithError(err).Fatal("Helm dependency call failed")
 	}
 
-	// ******
-	// err := h.utils.Chmod(filepath.Join(h.config.ChartPath, "charts"), 0777)
-	// if err != nil {
-	// 	fmt.Println("failed to change permissions: %w", err)
-	// }
-	// ******
+	dependencyDir := filepath.Join(h.config.ChartPath, "charts")
+	exists, err := h.utils.DirExists(dependencyDir)
+	if err != nil {
+		return fmt.Errorf("failed to get directory information: %v", err)
+	}
+
+	if exists {
+		if err := h.utils.Chmod(dependencyDir, 0777); err != nil {
+			return fmt.Errorf("failed to change permissions: %v", err)
+		}
+	}
 
 	return nil
 }

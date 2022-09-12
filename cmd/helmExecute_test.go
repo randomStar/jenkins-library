@@ -275,7 +275,7 @@ func TestRunHelmPush(t *testing.T) {
 			config: helmExecuteOptions{
 				HelmCommand: "publish",
 			},
-			methodString: "https://my.target.repository/helm_chart/helm_chart-1.2.3.tgz",
+			methodString: "https://my.target.repository",
 			methodError:  nil,
 		},
 		{
