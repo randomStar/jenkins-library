@@ -1,9 +1,14 @@
 import groovy.transform.Field
+import com.sap.piper.Utils
 
 @Field String STEP_NAME = getClass().getName()
 @Field String METADATA_FILE = 'metadata/kubernetesDeploy.yaml'
 
 void call(Map parameters = [:]) {
+
+    def utils = parameters.juStabUtils ?: new Utils()
+    utils.unstashAll(["deployDescriptor"])
+
     List credentials = [
         [type: 'file', id: 'kubeConfigFileCredentialsId', env: ['PIPER_kubeConfig']],
         [type: 'file', id: 'dockerConfigJsonCredentialsId', env: ['PIPER_dockerConfigJSON']],
