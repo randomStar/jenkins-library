@@ -6,8 +6,8 @@ import com.sap.piper.Utils
 
 void call(Map parameters = [:]) {
 
-    def utils = parameters.juStabUtils ?: new Utils()
-    utils.unstashAll(["deployDescriptor"])
+    // def utils = parameters.juStabUtils ?: new Utils()
+    // utils.unstashAll(["deployDescriptor"])
 
     List credentials = [
         [type: 'file', id: 'kubeConfigFileCredentialsId', env: ['PIPER_kubeConfig']],
