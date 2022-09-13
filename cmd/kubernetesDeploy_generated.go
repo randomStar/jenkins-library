@@ -229,9 +229,6 @@ func kubernetesDeployMetadata() config.StepData {
 					{Name: "dockerConfigJsonCredentialsId", Description: "Jenkins 'Secret file' credentials ID containing Docker config.json (with registry credential(s)).", Type: "jenkins"},
 					{Name: "githubTokenCredentialsId", Description: "Jenkins credentials ID containing the github token.", Type: "jenkins"},
 				},
-				Resources: []config.StepResources{
-					{Name: "deployDescriptor", Type: "stash"},
-				},
 				Parameters: []config.StepParameters{
 					{
 						Name:        "additionalParameters",

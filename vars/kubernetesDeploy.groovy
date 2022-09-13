@@ -1,6 +1,6 @@
 import groovy.transform.Field
-// import com.sap.piper.Utils
-// import static com.sap.piper.Prerequisites.checkScript
+import com.sap.piper.Utils
+import static com.sap.piper.Prerequisites.checkScript
 
 @Field String STEP_NAME = getClass().getName()
 @Field String METADATA_FILE = 'metadata/kubernetesDeploy.yaml'
