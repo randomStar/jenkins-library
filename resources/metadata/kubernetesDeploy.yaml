@@ -46,9 +46,9 @@ spec:
       - name: githubTokenCredentialsId
         description: Jenkins credentials ID containing the github token.
         type: jenkins
-    resources:
-      - name: deployDescriptor
-        type: stash
+    # resources:
+    #   - name: deployDescriptor
+    #     type: stash
     params:
       - name: additionalParameters
         aliases:

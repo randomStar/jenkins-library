@@ -7,11 +7,11 @@ import groovy.transform.Field
 
 void call(Map parameters = [:]) {
 
-    // final script = checkScript(this, parameters) ?: this
-    // String stageName = parameters.stageName ?: env.STAGE_NAME
+    final script = checkScript(this, parameters) ?: this
+    String stageName = parameters.stageName ?: env.STAGE_NAME
 
-    // def utils = parameters.juStabUtils ?: new Utils()
-    // utils.unstashAll(["deployDescriptor"])
+    def utils = parameters.juStabUtils ?: new Utils()
+    utils.unstashAll(["deployDescriptor"])
 
     // def utils = parameters.juStabUtils ?: new Utils()
     // utils.unstashAll(["deployDescriptor", "buildDescriptor"])
