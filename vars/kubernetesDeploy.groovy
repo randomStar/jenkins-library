@@ -1,17 +1,17 @@
 import groovy.transform.Field
-import com.sap.piper.Utils
-import static com.sap.piper.Prerequisites.checkScript
+// import com.sap.piper.Utils
+// import static com.sap.piper.Prerequisites.checkScript
 
 @Field String STEP_NAME = getClass().getName()
 @Field String METADATA_FILE = 'metadata/kubernetesDeploy.yaml'
 
 void call(Map parameters = [:]) {
 
-    final script = checkScript(this, parameters) ?: this
-    String stageName = parameters.stageName ?: env.STAGE_NAME
+    // final script = checkScript(this, parameters) ?: this
+    // String stageName = parameters.stageName ?: env.STAGE_NAME
 
-    def utils = parameters.juStabUtils ?: new Utils()
-    utils.unstashAll(["deployDescriptor"])
+    // def utils = parameters.juStabUtils ?: new Utils()
+    // utils.unstashAll(["deployDescriptor"])
 
     // def utils = parameters.juStabUtils ?: new Utils()
     // utils.unstashAll(["deployDescriptor", "buildDescriptor"])
