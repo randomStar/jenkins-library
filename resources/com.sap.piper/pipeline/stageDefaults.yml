@@ -64,6 +64,10 @@ spec:
           - name: npmExecuteEndToEndTests
             conditions:
               - configKey: 'appUrls'
+          - name: npmExecuteScripts
+            conditions:
+              - configKey: 'runScripts'
+              - configKey: 'dockerImage'
      - displayName: Security
        steps:
           - name: checkmarxExecuteScan
