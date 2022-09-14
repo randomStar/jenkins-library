@@ -51,6 +51,8 @@ spec:
         type: stash
       - name: downloadedFiles
         type: stash
+      - name: testDescriptor
+        type: stash
     params:
       - name: additionalParameters
         aliases:
