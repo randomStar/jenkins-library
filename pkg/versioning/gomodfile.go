@@ -125,5 +125,11 @@ func (m *GoMod) GetCoordinates() (Coordinates, error) {
 	if result.Version == "" {
 		result.Version = "unspecified"
 	}
+	// ******
+	fmt.Println("result.ArtifactID: ", result.ArtifactID)
+	fmt.Println("result.GroupID: ", result.GroupID)
+	fmt.Println("result.Version: ", result.Version)
+	fmt.Println("result.Packaging: ", result.Packaging)
+	// ******
 	return result, nil
 }
