@@ -123,7 +123,6 @@ func (exec *Execute) publish(packageJSON, registry, username, password string, p
 	}
 
 	if packBeforePublish {
-		err := exec.Utils.Chdir(filepath.Dir(packageJSON))
 		if err != nil {
 			return errors.Wrapf(err, "unable to switch to package.json directory for %s", filepath.Dir(packageJSON))
 		}
