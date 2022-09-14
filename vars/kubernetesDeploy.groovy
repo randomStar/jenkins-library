@@ -6,13 +6,6 @@ import static com.sap.piper.Prerequisites.checkScript
 @Field String METADATA_FILE = 'metadata/kubernetesDeploy.yaml'
 
 void call(Map parameters = [:]) {
-
-    // final script = checkScript(this, parameters) ?: this
-    // String stageName = parameters.stageName ?: env.STAGE_NAME
-
-    // def utils = parameters.juStabUtils ?: new Utils()
-    // utils.unstashAll(["deployDescriptor"])
-
     List credentials = [
         [type: 'file', id: 'kubeConfigFileCredentialsId', env: ['PIPER_kubeConfig']],
         [type: 'file', id: 'dockerConfigJsonCredentialsId', env: ['PIPER_dockerConfigJSON']],
