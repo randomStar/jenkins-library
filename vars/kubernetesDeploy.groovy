@@ -7,14 +7,11 @@ import static com.sap.piper.Prerequisites.checkScript
 
 void call(Map parameters = [:]) {
 
-    final script = checkScript(this, parameters) ?: this
-    String stageName = parameters.stageName ?: env.STAGE_NAME
-
-    def utils = parameters.juStabUtils ?: new Utils()
-    utils.unstashAll(["deployDescriptor"])
+    // final script = checkScript(this, parameters) ?: this
+    // String stageName = parameters.stageName ?: env.STAGE_NAME
 
     // def utils = parameters.juStabUtils ?: new Utils()
-    // utils.unstashAll(["deployDescriptor", "buildDescriptor"])
+    // utils.unstashAll(["deployDescriptor"])
 
     List credentials = [
         [type: 'file', id: 'kubeConfigFileCredentialsId', env: ['PIPER_kubeConfig']],
