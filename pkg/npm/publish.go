@@ -123,6 +123,11 @@ func (exec *Execute) publish(packageJSON, registry, username, password string, p
 	}
 
 	if packBeforePublish {
+		err := exec.Utils.Chdir(filepath.Dir(packageJSON))
+		if err != nil {
+			return errors.Wrapf(err, "unable to switch to package.json directory for %s", filepath.Dir(packageJSON))
+		}
+
 		tmpDirectory, err := exec.Utils.TempDir(".", "temp-")
 
 		if err != nil {
@@ -169,7 +174,7 @@ func (exec *Execute) publish(packageJSON, registry, username, password string, p
 			}
 		}
 
-		err = execRunner.RunExecutable("npm", "publish", "--tarball", tarballFilePath, "--userconfig", filepath.Join(tmpDirectory, ".piperNpmrc"), "--registry", registry)
+		err = execRunner.RunExecutable("cd", tmpDirectory, "&&", "npm", "publish", "--tarball", tarballFilePath, "--userconfig", filepath.Join(tmpDirectory, ".piperNpmrc"), "--registry", registry)
 		if err != nil {
 			return errors.Wrap(err, "failed publishing artifact")
 		}
