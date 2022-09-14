@@ -135,7 +135,7 @@ func (exec *Execute) publish(packageJSON, registry, username, password string, p
 
 		defer exec.Utils.RemoveAll(tmpDirectory)
 
-		err = execRunner.RunExecutable("npm", "pack", "--pack-destination", tmpDirectory)
+		err = execRunner.RunExecutable("cd", tmpDirectory, "&&", "npm", "pack", "--pack-destination", tmpDirectory)
 		if err != nil {
 			return err
 		}
