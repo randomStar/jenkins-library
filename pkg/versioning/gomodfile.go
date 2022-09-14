@@ -1,6 +1,7 @@
 package versioning
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -32,6 +33,9 @@ func (m *GoMod) init() error {
 			return errors.Wrapf(err, "failed to read file '%v'", m.path)
 		}
 		m.buildDescriptorContent = string(content)
+		// ******
+		fmt.Println("(init())m.buildDescriptorContent: ", m.buildDescriptorContent)
+		// ******
 	}
 	return nil
 }
@@ -39,9 +43,17 @@ func (m *GoMod) init() error {
 // GetVersion returns the go.mod descriptor version property
 func (m *GoMod) GetVersion() (string, error) {
 	buildDescriptorFilePath := m.path
+
+	// ******
+	fmt.Println("m.path: ", m.path)
+	// ******
+
 	var err error
 	if strings.Contains(m.path, "go.mod") {
 		buildDescriptorFilePath, err = searchDescriptor([]string{"version.txt", "VERSION"}, m.fileExists)
+		// ******
+		fmt.Println("buildDescriptorFilePath: ", buildDescriptorFilePath)
+		// ******
 		if err != nil {
 			err = m.init()
 			if err != nil {
@@ -52,6 +64,13 @@ func (m *GoMod) GetVersion() (string, error) {
 			if err != nil {
 				return "", errors.Wrap(err, "failed to parse go.mod file")
 			}
+			// ******
+			fmt.Println("parsed go.mod: ", parsed)
+			fmt.Println("parsed go.mod (module): ", parsed.Module)
+			fmt.Println("parsed go.mod (module.mod.path): ", parsed.Module.Mod.Path)
+			fmt.Println("parsed go.mod (module.mod.version): ", parsed.Module.Mod.Version)
+			fmt.Println("parsed go.mod (version): ", parsed.Go.Version)
+			// ******
 			if parsed.Module.Mod.Version != "" {
 				return parsed.Module.Mod.Version, nil
 			}

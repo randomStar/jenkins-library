@@ -1,6 +1,7 @@
 package versioning
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -45,6 +46,9 @@ func (v *Versionfile) GetVersion() (string, error) {
 	if err != nil {
 		return "", errors.Wrapf(err, "failed to read file '%v'", v.path)
 	}
+	// ******
+	fmt.Println("version: (versionFile)", string(content))
+	// ******
 
 	return strings.TrimSpace(string(content)), nil
 }
