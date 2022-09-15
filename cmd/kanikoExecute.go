@@ -79,6 +79,7 @@ func runKanikoExecute(config *kanikoExecuteOptions, telemetryData *telemetry.Cus
 	if len(config.DockerConfigJSON) > 0 {
 		var err error
 		dockerConfig, err = fileUtils.FileRead(config.DockerConfigJSON)
+		log.Entry().Infof("anil test existing docker config json is %v", dockerConfig)
 		if err != nil {
 			return errors.Wrapf(err, "failed to read existing docker config json at '%v'", config.DockerConfigJSON)
 		}
