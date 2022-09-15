@@ -49,6 +49,10 @@ spec:
     resources:
       - name: deployDescriptor
         type: stash
+      - name: downloadedHelmArtifact
+        type: stash
+      - name: testDescriptor
+        type: stash
     params:
       - name: additionalParameters
         aliases:
