@@ -100,7 +100,7 @@ func GetArtifact(buildTool, buildDescriptorFilePath string, opts *Options, utils
 	case "gradle":
 		// ******
 		fmt.Println("buildDescriptorFilePath: ", buildDescriptorFilePath)
-		fmt.Println("options: ", opts)
+		fmt.Printf("options: %+v\n", opts)
 		// ******
 		if len(buildDescriptorFilePath) == 0 {
 			buildDescriptorFilePath = "gradle.properties"
@@ -133,6 +133,10 @@ func GetArtifact(buildTool, buildDescriptorFilePath string, opts *Options, utils
 			updateAppVersion: opts.HelmUpdateAppVersion,
 		}
 	case "maven":
+		// ******
+		fmt.Println("buildDescriptorFilePath: ", buildDescriptorFilePath)
+		fmt.Printf("options: %+v\n", opts)
+		// ******
 		if len(buildDescriptorFilePath) == 0 {
 			buildDescriptorFilePath = "pom.xml"
 		}

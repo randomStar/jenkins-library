@@ -44,6 +44,9 @@ func (m *Maven) VersioningScheme() string {
 
 // GetCoordinates reads the coordinates from the maven pom.xml descriptor file
 func (m *Maven) GetCoordinates() (Coordinates, error) {
+	// ******
+	fmt.Printf("maven struct: %+v\n", m)
+	// ******
 	result := Coordinates{}
 	var err error
 	result.GroupID, err = m.GetGroupID()
@@ -62,6 +65,9 @@ func (m *Maven) GetCoordinates() (Coordinates, error) {
 	if err != nil {
 		return result, err
 	}
+	// ******
+	fmt.Printf("GetCoordinates result: %+v\n", result)
+	// ******
 	return result, nil
 }
 
