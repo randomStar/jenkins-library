@@ -107,6 +107,10 @@ var sshAgentAuth = ssh.NewSSHAgentAuth
 
 func runArtifactPrepareVersion(config *artifactPrepareVersionOptions, telemetryData *telemetry.CustomData, commonPipelineEnvironment *artifactPrepareVersionCommonPipelineEnvironment, artifact versioning.Artifact, utils artifactPrepareVersionUtils, repository gitRepository, getWorktree func(gitRepository) (gitWorktree, error)) error {
 
+	// ******
+	fmt.Printf("\nconfig: %+v\n", config)
+	// ******
+
 	telemetryData.Custom1Label = "buildTool"
 	telemetryData.Custom1 = config.BuildTool
 	telemetryData.Custom2Label = "filePath"
@@ -122,6 +126,10 @@ func runArtifactPrepareVersion(config *artifactPrepareVersionOptions, telemetryD
 		VersioningScheme:    config.CustomVersioningScheme,
 		VersionSource:       config.DockerVersionSource,
 	}
+
+	// ******
+	fmt.Printf("\nartifactOpts: %+v\n", artifactOpts)
+	// ******
 
 	var err error
 	if artifact == nil {

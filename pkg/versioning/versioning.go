@@ -98,6 +98,10 @@ func GetArtifact(buildTool, buildDescriptorFilePath string, opts *Options, utils
 			versionField: "version",
 		}
 	case "gradle":
+		// ******
+		fmt.Println("buildDescriptorFilePath: ", buildDescriptorFilePath)
+		fmt.Println("options: ", opts)
+		// ******
 		if len(buildDescriptorFilePath) == 0 {
 			buildDescriptorFilePath = "gradle.properties"
 		}

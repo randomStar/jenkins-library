@@ -1,6 +1,7 @@
 package versioning
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -76,6 +77,9 @@ func (g *Gradle) initGetArtifact() error {
 			return err
 		}
 		g.gradlePropsOut = []byte(stdOut)
+		// ******
+		fmt.Printf("\ngradlePropsOut: %v\n", stdOut)
+		// ******
 	}
 	return nil
 }
@@ -121,6 +125,9 @@ func (g *Gradle) GetCoordinates() (Coordinates, error) {
 
 // GetGroupID returns the current ID of the Group
 func (g *Gradle) GetGroupID() (string, error) {
+	// ******
+	fmt.Printf("\nGetGroupID\n")
+	// ******
 	err := g.initGetArtifact()
 	if err != nil {
 		return "", err
@@ -135,6 +142,9 @@ func (g *Gradle) GetGroupID() (string, error) {
 
 // GetArtifactID returns the current ID of the artifact
 func (g *Gradle) GetArtifactID() (string, error) {
+	// ******
+	fmt.Printf("\nGetArtifactID\n")
+	// ******
 	err := g.initGetArtifact()
 	if err != nil {
 		return "", err
@@ -149,6 +159,9 @@ func (g *Gradle) GetArtifactID() (string, error) {
 
 // GetVersion returns the current version of the artifact
 func (g *Gradle) GetVersion() (string, error) {
+	// ******
+	fmt.Printf("\nGetVersion\n")
+	// ******
 	err := g.init()
 	if err != nil {
 		return "", err
