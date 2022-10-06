@@ -19,6 +19,10 @@ func npmExecuteScripts(config npmExecuteScriptsOptions, telemetryData *telemetry
 }
 
 func runNpmExecuteScripts(npmExecutor npm.Executor, config *npmExecuteScriptsOptions, commonPipelineEnvironment *npmExecuteScriptsCommonPipelineEnvironment) error {
+	// ***
+	log.Entry().Info("testingFramework branch")
+	// ***
+
 	if config.Install {
 		if len(config.BuildDescriptorList) > 0 {
 			if err := npmExecutor.InstallAllDependencies(config.BuildDescriptorList); err != nil {
