@@ -26,7 +26,7 @@ func (h *HelmChart) init() error {
 			return fmt.Errorf("failed to find a helm chart file")
 		}
 		// use first chart which can be found
-		h.path = charts[0]
+		h.path = charts[len(charts)-1]
 	}
 
 	if len(h.metadata.Version) == 0 {
