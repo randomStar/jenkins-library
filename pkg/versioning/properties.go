@@ -33,6 +33,9 @@ func (p *PropertiesFile) init() error {
 			return errors.Wrapf(err, "failed to load file %v", p.path)
 		}
 	}
+	// ***
+	fmt.Printf("\nproperties init: content: %+v\n", p.content)
+	// ***
 	return nil
 }
 
