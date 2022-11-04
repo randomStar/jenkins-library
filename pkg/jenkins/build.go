@@ -20,6 +20,11 @@ type Build interface {
 // WaitForBuildToFinish waits till a build is finished.
 func WaitForBuildToFinish(ctx context.Context, build Build, pollInterval time.Duration) {
 	//TODO: handle timeout?
+
+	// ***
+	fmt.Println("debug line")
+	// ***
+
 	for build.IsRunning(ctx) {
 		time.Sleep(pollInterval)
 		build.Poll(ctx)
