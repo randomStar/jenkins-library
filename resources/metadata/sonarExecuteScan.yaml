@@ -38,7 +38,7 @@ spec:
         description: "Token used to authenticate with the Sonar Server."
         scope:
           - PARAMETERS
-        secret: true
+        secret: false
         resourceRef:
           - type: vaultSecret
             name: sonarVaultSecretName
