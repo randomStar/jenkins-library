@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -123,8 +124,8 @@ func runSonar(config sonarExecuteScanOptions, client piperhttp.Downloader, runne
 	}
 	if len(config.Token) > 0 {
 		log.Entry().Debugf("setting env variable SONAR_TOKEN to %v", config.Token)
-		// sonar.addOption(fmt.Sprintf("sonar.token=%s", config.Token))
-		sonar.addEnvironment("SONAR_TOKEN=" + config.Token)
+		sonar.addOption(fmt.Sprintf("sonar.token=%s", strings.TrimSpace(config.Token)))
+		// sonar.addEnvironment("SONAR_TOKEN=" + config.Token)
 	}
 	if len(config.Organization) > 0 {
 		sonar.addOption("sonar.organization=" + config.Organization)
