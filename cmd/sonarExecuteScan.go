@@ -173,6 +173,11 @@ func runSonar(config sonarExecuteScanOptions, client piperhttp.Downloader, runne
 
 	sonar.options = piperutils.PrefixIfNeeded(piperutils.Trim(sonar.options), "-D")
 
+	// ***
+	log.Entry().Debugf("\nconfig.Branch: %v\n", config.BranchName)
+	log.Entry().Debugf("\nconfig: %+v\n", config)
+	// ***
+
 	log.Entry().
 		WithField("command", sonar.binary).
 		WithField("options", sonar.options).
