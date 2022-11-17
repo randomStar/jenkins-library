@@ -468,7 +468,8 @@ steps:
       archive: false
       active: false
     cobertura:
-      pattern: '**/target/coverage/**/cobertura-coverage.xml'
+      # pattern: '**/target/coverage/**/cobertura-coverage.xml'
+      pattern: '**/cobertura-coverage.xml'
       onlyStableBuilds: true
       allowEmptyResults: true
       archive: false
