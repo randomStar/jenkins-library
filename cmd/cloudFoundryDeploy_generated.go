@@ -559,7 +559,7 @@ func cloudFoundryDeployMetadata() config.StepData {
 				},
 			},
 			Containers: []config.Container{
-				{Name: "cfDeploy", Image: "ppiper/cf-cli:latest"},
+				{Name: "cfDeploy", Image: "piper.int.repositories.cloud.sap/piper/cf-cli"},
 			},
 			Outputs: config.StepOutputs{
 				Resources: []config.StepResources{
