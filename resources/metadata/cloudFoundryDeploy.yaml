@@ -395,7 +395,8 @@ spec:
             name: cloudfoundryVaultSecretName
   containers:
     - name: cfDeploy
-      image: ppiper/cf-cli:latest
+      # image: ppiper/cf-cli:latest
+      image: piper.int.repositories.cloud.sap/piper/cf-cli
   outputs:
     resources:
       - name: influx
