@@ -59,7 +59,8 @@ func (t *Telemetry) Initialize(telemetryDisabled bool, stepName string) {
 
 	if t.BaseURL == "" {
 		//SWA baseURL
-		t.BaseURL = "https://webanalytics.cfapps.eu10.hana.ondemand.com"
+		//t.BaseURL = "https://webanalytics.cfapps.eu10.hana.ondemand.com"
+		t.BaseURL = "https://webanalytics-anything.cfapps.eu10.hana.ondemand.com"
 	}
 	if t.Endpoint == "" {
 		// SWA endpoint
