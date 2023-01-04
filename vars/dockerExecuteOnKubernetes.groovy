@@ -483,14 +483,20 @@ private List getContainerList(config) {
     //If no custom jnlp agent provided as default jnlp agent (jenkins/jnlp-slave) as defined in the plugin, see https://github.com/jenkinsci/kubernetes-plugin#pipeline-support
     def result = []
     //allow definition of jnlp image via environment variable JENKINS_JNLP_IMAGE in the Kubernetes landscape or via config as fallback
-    if (env.JENKINS_JNLP_IMAGE || config.jenkinsKubernetes.jnlpAgent) {
+    // if (env.JENKINS_JNLP_IMAGE || config.jenkinsKubernetes.jnlpAgent) {
+    if (config.jenkinsKubernetes.jnlpAgent) {
+
+        echo "jnlpAgent: ${config.jenkinsKubernetes.jnlpAgent}" 
 
         def jnlpContainerName = 'jnlp'
 
         def jnlpSpec = [
             name : jnlpContainerName,
-            image: env.JENKINS_JNLP_IMAGE ?: config.jenkinsKubernetes.jnlpAgent
+            image: config.jenkinsKubernetes.jnlpAgent
+            // image: env.JENKINS_JNLP_IMAGE ?: config.jenkinsKubernetes.jnlpAgent
         ]
+
+        echo "jnlpSpec: ${jnlpSpec}"
 
         def resources = getResources(jnlpContainerName, config)
         if(resources) {
