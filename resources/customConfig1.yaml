@@ -1,0 +1,3 @@
+general:
+  jenkinsKubernetes:
+    jnlpAgent: 'ppiper/jenkins-agent-k8s:v9'
