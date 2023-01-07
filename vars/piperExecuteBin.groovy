@@ -14,6 +14,12 @@ import static com.sap.piper.Prerequisites.checkScript
 
 void call(Map parameters = [:], String stepName, String metadataFile, List credentialInfo, boolean failOnMissingReports = false, boolean failOnMissingLinks = false, boolean failOnError = false) {
 
+    // ***
+    echo "***"
+    echo "parameters (piperExecuteBin): ${parameters}"
+    echo "***"
+    // ***
+
     Map handlePipelineStepErrorsParameters = [stepName: stepName, stepParameters: parameters]
     if (failOnError) {
         handlePipelineStepErrorsParameters.failOnError = true
@@ -38,6 +44,9 @@ void call(Map parameters = [:], String stepName, String metadataFile, List crede
         ]) {
             String defaultConfigArgs = getCustomDefaultConfigsArg()
             String customConfigArg = getCustomConfigArg(script)
+
+            echo "defaultConfigArgs: ${defaultConfigArgs}"
+            echo "customConfigArg: ${customConfigArg}"
 
             echo "PIPER_parametersJSON: ${groovy.json.JsonOutput.toJson(stepParameters)}"
 

@@ -252,6 +252,8 @@ void call(Map parameters = [:], body) {
             .addIfEmpty('uniqueId', UUID.randomUUID().toString())
             .use()
 
+            echo "config (dockerExeciteOnK8s): ${config}"
+
         utils.pushToSWA([
             step         : STEP_NAME,
             stepParamKey1: 'scriptMissing',
