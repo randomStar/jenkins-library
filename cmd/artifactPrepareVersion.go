@@ -123,6 +123,8 @@ func runArtifactPrepareVersion(config *artifactPrepareVersionOptions, telemetryD
 		VersionSource:       config.DockerVersionSource,
 	}
 
+	fmt.Println("test")
+
 	var err error
 	if artifact == nil {
 		artifact, err = versioning.GetArtifact(config.BuildTool, config.FilePath, &artifactOpts, utils)
