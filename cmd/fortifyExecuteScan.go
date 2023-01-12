@@ -310,6 +310,9 @@ func runFortifyScan(ctx context.Context, config fortifyExecuteScanOptions, sys f
 		if err != nil {
 			return reports, fmt.Errorf("failed to generate SARIF")
 		}
+		// ***
+		fmt.Println("test")
+		// ***
 		log.Entry().Debug("Writing simplified sarif file in plain text to disk.")
 		paths, err := fortify.WriteSarif(sarifSimplified, "result.sarif")
 		if err != nil {
