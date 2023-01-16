@@ -153,6 +153,10 @@ func whitesourceExecuteScan(config ScanOptions, _ *telemetry.CustomData, commonP
 }
 
 func runWhitesourceExecuteScan(ctx context.Context, config *ScanOptions, scan *ws.Scan, utils whitesourceUtils, sys whitesource, commonPipelineEnvironment *whitesourceExecuteScanCommonPipelineEnvironment, influx *whitesourceExecuteScanInflux) error {
+
+	// ***
+	fmt.Printf("\nconfig: %+v\n", config)
+
 	if err := resolveAggregateProjectName(config, scan, sys); err != nil {
 		return errors.Wrapf(err, "failed to resolve and aggregate project name")
 	}
