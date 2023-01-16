@@ -238,6 +238,11 @@ func runWhitesourceScan(ctx context.Context, config *ScanOptions, scan *ws.Scan,
 }
 
 func checkAndReportScanResults(ctx context.Context, config *ScanOptions, scan *ws.Scan, utils whitesourceUtils, sys whitesource, influx *whitesourceExecuteScanInflux) ([]piperutils.Path, error) {
+
+	// ***
+	fmt.Printf("\nscan: %+v\n", scan)
+	fmt.Printf("\nAggregateProjectName: %+v\n", scan.AggregateProjectName)
+
 	reportPaths := []piperutils.Path{}
 	if !config.Reporting && !config.SecurityVulnerabilities {
 		return reportPaths, nil
@@ -272,6 +277,10 @@ func checkAndReportScanResults(ctx context.Context, config *ScanOptions, scan *w
 	reportPaths = append(reportPaths, rPath)
 
 	if config.SecurityVulnerabilities {
+
+		// ***
+		fmt.Printf("\nconfig.SecurityVulnerabilities: %+v\n", config.SecurityVulnerabilities)
+
 		rPaths, err := checkSecurityViolations(ctx, config, scan, sys, utils, influx)
 		reportPaths = append(reportPaths, rPaths...)
 		if err != nil {
@@ -582,6 +591,11 @@ func checkPolicyViolations(ctx context.Context, config *ScanOptions, scan *ws.Sc
 }
 
 func checkSecurityViolations(ctx context.Context, config *ScanOptions, scan *ws.Scan, sys whitesource, utils whitesourceUtils, influx *whitesourceExecuteScanInflux) ([]piperutils.Path, error) {
+
+	fmt.Printf("\nconfig: %+v\n", config)
+	fmt.Printf("\nprojectName: %+v\n", config.ProjectName)
+	fmt.Printf("\ncprojectToken: %+v\n", config.ProjectToken)
+
 	var reportPaths []piperutils.Path
 	// Check for security vulnerabilities and fail the build if cvssSeverityLimit threshold is crossed
 	// convert config.CvssSeverityLimit to float64
@@ -596,6 +610,9 @@ func checkSecurityViolations(ctx context.Context, config *ScanOptions, scan *ws.
 	assessments := readAssessmentsFromFile(config.AssessmentFile, utils)
 
 	if config.ProjectToken != "" {
+
+		// ***
+		fmt.Println("point one")
 		project := ws.Project{Name: config.ProjectName, Token: config.ProjectToken}
 		// ToDo: see if HTML report generation is really required here
 		// we anyway need to do some refactoring here since config.ProjectToken != "" essentially indicates an aggregated project
@@ -603,6 +620,9 @@ func checkSecurityViolations(ctx context.Context, config *ScanOptions, scan *ws.
 			return reportPaths, err
 		}
 	} else {
+		// ***
+		fmt.Println("point two")
+
 		vulnerabilitiesCount := 0
 		var errorsOccured []string
 		allAlerts := []ws.Alert{}

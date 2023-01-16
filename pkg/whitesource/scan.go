@@ -85,6 +85,9 @@ func (s *Scan) ScannedProjects() []Project {
 	for _, project := range s.scannedProjects {
 		projects = append(projects, project)
 	}
+	// ***
+	fmt.Printf("\nprojects: %+v\n", projects)
+
 	return projects
 }
 
