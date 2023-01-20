@@ -203,6 +203,7 @@ void call(Map parameters = [:], body) {
                     dockerWorkspace: config.dockerWorkspace,
                     stashContent: config.stashContent,
                     stashNoDefaultExcludes: config.stashNoDefaultExcludes,
+                    
                 ]
 
                 if (config.sidecarImage) {
