@@ -53,7 +53,7 @@ general:
   globalExtensionsDirectory: '.pipeline/tmp/global_extensions/'
   jenkinsKubernetes:
     # jnlpAgent: 'jenkins/inbound-agent:alpine-jdk11'
-    # jnlpAgent: 'jenkins/inbound-agent:jdk11'
+    jnlpAgent: 'jenkins/inbound-agent:jdk11'
     # jnlpAgent: 'ppiper/jenkins-agent-k8s:v9'
     # securityContext:
     # Setting security context globally is currently not working with jaas
