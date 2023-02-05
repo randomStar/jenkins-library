@@ -154,6 +154,9 @@ func runSonar(config sonarExecuteScanOptions, client piperhttp.Downloader, runne
 	if config.InferJavaBinaries && !isInOptions(config, javaBinaries) {
 		addJavaBinaries()
 	}
+	if config.WaitForQualityGate {
+		sonar.addOption("sonar.qualitygate.wait=true")
+	}
 	if err := handlePullRequest(config); err != nil {
 		log.SetErrorCategory(log.ErrorConfiguration)
 		return err
