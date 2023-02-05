@@ -98,7 +98,7 @@ func (g *GitHubActionsConfigProvider) IsPullRequest() bool {
 	// ***
 	val, exists := os.LookupEnv("GITHUB_HEAD_REF")
 	fmt.Printf("\nGITHUB_HEAD_REF exists: %v, val: %q, len: %v\n", exists, val, len(val))
-	return exists
+	return areIndicatingEnvVarsSet([]string{"GITHUB_HEAD_REF"})
 }
 
 func isGitHubActions() bool {
