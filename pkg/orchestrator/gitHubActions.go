@@ -1,6 +1,7 @@
 package orchestrator
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -94,7 +95,9 @@ func (g *GitHubActionsConfigProvider) GetPullRequestConfig() PullRequestConfig {
 }
 
 func (g *GitHubActionsConfigProvider) IsPullRequest() bool {
-	_, exists := os.LookupEnv("GITHUB_HEAD_REF")
+	// ***
+	val, exists := os.LookupEnv("GITHUB_HEAD_REF")
+	fmt.Printf("\nGITHUB_HEAD_REF exists: %v, val: %v, len: %v\n", exists, val, len(val))
 	return exists
 }
 
