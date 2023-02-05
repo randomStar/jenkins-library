@@ -101,7 +101,7 @@ func areIndicatingEnvVarsSet(envVars []string) bool {
 // Checks if var is set and neither empty nor false
 func truthy(key string) bool {
 	val, exists := os.LookupEnv(key)
-	fmt.Printf("\n%v exists: %v, val: %v, len: %v\n", key, exists, val, len(val))
+	os.Stderr.WriteString(fmt.Sprintf("\n%v exists: %v, val: %v, len: %v\n", key, exists, val, len(val)))
 	if !exists {
 		return false
 	}
