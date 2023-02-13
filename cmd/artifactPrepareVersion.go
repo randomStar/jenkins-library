@@ -55,6 +55,7 @@ type artifactPrepareVersionUtils interface {
 	RunExecutable(e string, p ...string) error
 
 	DownloadFile(url, filename string, header netHttp.Header, cookies []*netHttp.Cookie) error
+	SetOptions(options piperhttp.ClientOptions)
 
 	Glob(pattern string) (matches []string, err error)
 	FileExists(filename string) (bool, error)
@@ -203,6 +204,13 @@ func runArtifactPrepareVersion(config *artifactPrepareVersionOptions, telemetryD
 		}
 
 		if config.VersioningType == "cloud" {
+			if len(config.CustomTLSCertificateLinks) > 0 {
+				clientOptions := piperhttp.ClientOptions{
+					TransportSkipVerification: false,
+					TrustedCerts:              config.CustomTLSCertificateLinks,
+				}
+				utils.SetOptions(clientOptions)
+			}
 			// commit changes and push to repository (including new version tag)
 			gitCommitID, err = pushChanges(config, newVersion, repository, worktree, now)
 			if err != nil {
