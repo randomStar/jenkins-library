@@ -386,7 +386,7 @@ func addDetectArgs(args []string, config detectExecuteScanOptions, utils detectU
 		mavenArgs = append(mavenArgs, fmt.Sprintf("-Dmaven.repo.local=%v", absolutePath))
 	}
 
-	if len(mavenArgs) > 0 {
+	if len(mavenArgs) > 0 && !ifMavenCommandProvided(config) {
 		args = append(args, fmt.Sprintf("\"--detect.maven.build.command='%v'\"", strings.Join(mavenArgs, " ")))
 	}
 
@@ -774,4 +774,14 @@ func createToolRecordDetect(utils detectUtils, workspace string, config detectEx
 		return "", err
 	}
 	return record.GetFileName(), nil
+}
+
+func ifMavenCommandProvided(config detectExecuteScanOptions) bool {
+	for _, scanOptions := range config.ScanProperties {
+		if strings.Contains(scanOptions, "--detect.maven.build.command=") {
+			return true
+		}
+	}
+
+	return false
 }
