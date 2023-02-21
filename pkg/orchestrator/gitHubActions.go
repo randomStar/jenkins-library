@@ -1,6 +1,7 @@
 package orchestrator
 
 import (
+	"fmt"
 	"strings"
 	"time"
 
@@ -86,7 +87,8 @@ func (g *GitHubActionsConfigProvider) GetRepoURL() string {
 
 func (g *GitHubActionsConfigProvider) GetPullRequestConfig() PullRequestConfig {
 	githubRef := getEnv("GITHUB_REF", "n/a")
-	prNumber := strings.TrimSuffix(strings.TrimPrefix(githubRef, "refs/pull/:"), "/merge")
+	fmt.Println("GITHUB_REF::: ", githubRef)
+	prNumber := strings.TrimSuffix(strings.TrimPrefix(githubRef, "refs/pull/"), "/merge")
 	return PullRequestConfig{
 		Branch: getEnv("GITHUB_HEAD_REF", "n/a"),
 		Base:   getEnv("GITHUB_BASE_REF", "n/a"),
