@@ -86,7 +86,7 @@ func (g *GitHubActionsConfigProvider) GetRepoURL() string {
 
 func (g *GitHubActionsConfigProvider) GetPullRequestConfig() PullRequestConfig {
 	githubRef := getEnv("GITHUB_REF", "n/a")
-	prNumber := strings.TrimSuffix(strings.TrimPrefix(githubRef, "/ref/pull/:"), "/merge/")
+	prNumber := strings.TrimSuffix(strings.TrimPrefix(githubRef, "refs/pull/:"), "/merge")
 	return PullRequestConfig{
 		Branch: getEnv("GITHUB_HEAD_REF", "n/a"),
 		Base:   getEnv("GITHUB_BASE_REF", "n/a"),
