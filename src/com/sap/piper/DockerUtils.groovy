@@ -37,16 +37,10 @@ class DockerUtils implements Serializable {
         def targetImageFullName = targetDockerRegistry + target.image
 
         if (!withDockerDaemon()) {
-            script.withCredentials(
-                [script.usernamePassword(
-                credentialsId: source.credentialsId,
-                passwordVariable: 'src_password',
-                usernameVariable: 'src_userid')], 
-                [script.usernamePassword(
-                credentialsId: target.credentialsId,
-                passwordVariable: 'password',
-                usernameVariable: 'userid')]
-            ) {
+            script.withCredentials([
+                script.usernamePassword(credentialsId: source.credentialsId, passwordVariable: 'src_password', usernameVariable: 'src_userid'), 
+                script.usernamePassword(credentialsId: target.credentialsId, passwordVariable: 'password', usernameVariable: 'userid')
+            ]) {
                 skopeoMoveImage(sourceImageFullName, script.src_userid, script.src_password, targetImageFullName, script.userid, script.password)
             }
         }
