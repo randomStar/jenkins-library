@@ -21,6 +21,10 @@ type GitHubActionsConfigProvider struct {
 	run    run
 }
 
+func (g *GitHubActionsConfigProvider) InitOrchestratorProvider(settings *OrchestratorSettings) {
+	log.Entry().Debug("Successfully initialized GitHubActions config provider")
+}
+
 func getActionsURL() string {
 	ghURL := getEnv("GITHUB_URL", "")
 	switch ghURL {

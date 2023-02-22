@@ -18,6 +18,7 @@ const (
 )
 
 type OrchestratorSpecificConfigProviding interface {
+	InitOrchestratorProvider(settings *OrchestratorSettings)
 	OrchestratorType() string
 	OrchestratorVersion() string
 	GetStageName() string
