@@ -84,13 +84,20 @@ func (g *GitHubActionsConfigProvider) GetBuildStatus() string {
 }
 
 func (g *GitHubActionsConfigProvider) GetLog() ([]byte, error) {
+	// token needs to be available in g
+	// get IDs of all jobs
+	// get logs of all job IDs
+	// merge them
+
+	ghToken := getEnv("GITHUB_TOKEN", "")
+
 	resp, err := g.client.GetRequest(
 		fmt.Sprintf(
 			"%s/runs/%s/jobs", getActionsURL(), getEnv("GITHUB_RUN_ID", ""),
 		),
 		map[string][]string{
 			"Accept":        {"application/vnd.github+json"},
-			"Authorization": {"Bearer $GITHUB_TOKEN"},
+			"Authorization": {fmt.Sprintf("Bearer %s", ghToken)},
 		}, nil)
 	if err != nil {
 		return nil, fmt.Errorf("can't get API data: %w", err)
@@ -98,7 +105,7 @@ func (g *GitHubActionsConfigProvider) GetLog() ([]byte, error) {
 	}
 	var ids struct {
 		Jobs []struct {
-			Id string `json:"id"`
+			Id int64 `json:"id"`
 		} `json:"jobs"`
 	}
 	err = piperHttp.ParseHTTPResponseBodyJSON(resp, &ids)
@@ -107,7 +114,7 @@ func (g *GitHubActionsConfigProvider) GetLog() ([]byte, error) {
 	}
 	ids = struct {
 		Jobs []struct {
-			Id string `json:"id"`
+			Id int64 `json:"id"`
 		} `json:"jobs"`
 		// we cant get the log for the last(current) job
 	}{Jobs: ids.Jobs[:len(ids.Jobs)-1]}
@@ -132,11 +139,11 @@ func (g *GitHubActionsConfigProvider) GetLog() ([]byte, error) {
 			defer sem.Release(1)
 			resp, err := g.client.GetRequest(
 				fmt.Sprintf(
-					"%s/jobs/%s/logs", getActionsURL(), ids.Jobs[j].Id,
+					"%s/jobs/%d/logs", getActionsURL(), ids.Jobs[j].Id,
 				),
 				map[string][]string{
 					"Accept":        {"application/vnd.github+json"},
-					"Authorization": {"Bearer $GITHUB_TOKEN"},
+					"Authorization": {fmt.Sprintf("Bearer %s", ghToken)},
 				}, nil)
 			if err != nil {
 				return fmt.Errorf("can't get API data: %w", err)

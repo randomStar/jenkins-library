@@ -2,14 +2,15 @@ package orchestrator
 
 import (
 	"fmt"
-	piperHttp "github.com/SAP/jenkins-library/pkg/http"
-	"github.com/jarcoal/httpmock"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	piperHttp "github.com/SAP/jenkins-library/pkg/http"
+	"github.com/jarcoal/httpmock"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGitHubActions(t *testing.T) {
@@ -148,5 +149,34 @@ func TestGitHubActions(t *testing.T) {
 		actual, _ := p.GetLog()
 		fmt.Println(string(actual))
 		assert.Equal(t, strings.Join(logs, ""), string(actual))
+	})
+
+	t.Run("Test log receiving 2", func(t *testing.T) {
+		defer resetEnv(os.Environ())
+		os.Clearenv()
+		os.Unsetenv("GITHUB_HEAD_REF")
+		os.Setenv("GITHUB_ACTIONS", "true")
+		os.Setenv("GITHUB_REF_NAME", "feat/test-gh-actions")
+		os.Setenv("GITHUB_REF", "refs/heads/feat/test-gh-actions")
+		os.Setenv("GITHUB_SHA", "abcdef42713")
+		os.Setenv("GITHUB_REPOSITORY", "project-piper/azure-demo-k8s-node")
+		os.Setenv("GITHUB_URL", "https://github.tools.sap/")
+		os.Setenv("GITHUB_TOKEN", "")
+		os.Setenv("GITHUB_RUN_ID", "1738520")
+		p := func() OrchestratorSpecificConfigProviding {
+			g := GitHubActionsConfigProvider{}
+			g.client = piperHttp.Client{}
+			g.client.SetOptions(piperHttp.ClientOptions{
+				MaxRequestDuration:        5 * time.Second,
+				Token:                     "TOKEN",
+				TransportSkipVerification: true,
+				UseDefaultTransport:       true, // need to use default transport for http mock
+				MaxRetries:                -1,
+			})
+			return &g
+		}()
+
+		_, _ = p.GetLog()
+
 	})
 }
