@@ -42,18 +42,18 @@ class DockerUtils implements Serializable {
                     script.usernamePassword(credentialsId: source.credentialsId, passwordVariable: 'src_password', usernameVariable: 'src_userid'), 
                     script.usernamePassword(credentialsId: target.credentialsId, passwordVariable: 'password', usernameVariable: 'userid')
                 ]) {
-                script.println "case 1"
-                script.echo "src_userid " + script.src_userid
-                skopeoMoveImage(sourceImageFullName, script.src_userid, script.src_password, targetImageFullName, script.userid, script.password)
-            }
+                    script.println "case 1"
+                    script.echo "src_userid " + script.src_userid
+                    skopeoMoveImage(sourceImageFullName, script.src_userid, script.src_password, targetImageFullName, script.userid, script.password)
+                }
             } else {
                 script.withCredentials([
                     // script.usernamePassword(credentialsId: source.credentialsId, passwordVariable: 'src_password', usernameVariable: 'src_userid'), 
                     script.usernamePassword(credentialsId: target.credentialsId, passwordVariable: 'password', usernameVariable: 'userid')
-            ]) {
-                script.println "case 2"
-                skopeoMoveImage(sourceImageFullName, '', '', targetImageFullName, script.userid, script.password)
-            }
+                ]) {
+                    script.println "case 2"
+                    skopeoMoveImage(sourceImageFullName, '', '', targetImageFullName, script.userid, script.password)
+                }
 
             }
         }
