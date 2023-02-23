@@ -43,6 +43,7 @@ class DockerUtils implements Serializable {
                     script.usernamePassword(credentialsId: target.credentialsId, passwordVariable: 'password', usernameVariable: 'userid')
                 ]) {
                 script.println "case 1"
+                script.echo "src_userid " + script.src_userid
                 skopeoMoveImage(sourceImageFullName, script.src_userid, script.src_password, targetImageFullName, script.userid, script.password)
             }
             } else {
@@ -63,9 +64,13 @@ class DockerUtils implements Serializable {
     private void skopeoMoveImage(sourceImageFullName, sourceUserId, sourcePassword, targetImageFullName, targetUserId, targetPassword) {
         if (sourceUserId && sourcePassword) {
             script.println "case 1"
+            script.echo "sourceUserId: " + sourceUserId
+            script.echo "sourcePassword: " + sourcePassword
             script.sh "skopeo copy --src-tls-verify=false --src-creds=${BashUtils.quoteAndEscape(sourceUserId)}:${BashUtils.quoteAndEscape(sourcePassword)} --dest-tls-verify=false --dest-creds=${BashUtils.quoteAndEscape(targetUserId)}:${BashUtils.quoteAndEscape(targetPassword)} docker://${sourceImageFullName} docker://${targetImageFullName}"
         } else {
             script.println "case 2"
+            script.echo "sourceUserId: " + sourceUserId
+            script.echo "sourcePassword: " + sourcePassword
             script.sh "skopeo copy --src-tls-verify=false --dest-tls-verify=false --dest-creds=${BashUtils.quoteAndEscape(targetUserId)}:${BashUtils.quoteAndEscape(targetPassword)} docker://${sourceImageFullName} docker://${targetImageFullName}"
         }
     }
