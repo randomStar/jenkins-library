@@ -41,7 +41,7 @@ func (g *GitHubActionsConfigProvider) InitOrchestratorProvider(settings *Orchest
 		MaxRetries:       3,
 		TransportTimeout: time.Second * 10,
 	})
-	log.Entry().Debug("Successfully initialized GitHubActions config provider")
+	log.Entry().Debug("Successfully initialized GitHubActions config provider///")
 }
 
 func getActionsURL() string {
