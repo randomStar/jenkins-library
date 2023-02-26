@@ -35,6 +35,12 @@ type Logs struct {
 }
 
 func (g *GitHubActionsConfigProvider) InitOrchestratorProvider(settings *OrchestratorSettings) {
+	g.client = piperHttp.Client{}
+	g.client.SetOptions(piperHttp.ClientOptions{
+		BearerToken:      settings.GitHubToken,
+		MaxRetries:       3,
+		TransportTimeout: time.Second * 10,
+	})
 	log.Entry().Debug("Successfully initialized GitHubActions config provider")
 }
 
@@ -49,16 +55,16 @@ func getActionsURL() string {
 	return fmt.Sprintf("%s/repos/%s/actions", ghURL, getEnv("GITHUB_REPOSITORY", ""))
 }
 
-func gitHubActionsConfigProvider(settings *OrchestratorSettings) (*GitHubActionsConfigProvider, error) {
-	g := GitHubActionsConfigProvider{}
-	g.client = piperHttp.Client{}
-	g.client.SetOptions(piperHttp.ClientOptions{
-		BearerToken:      settings.GitHubToken,
-		MaxRetries:       3,
-		TransportTimeout: time.Second * 10,
-	})
-	return &g, nil
-}
+// func gitHubActionsConfigProvider(settings *OrchestratorSettings) (*GitHubActionsConfigProvider, error) {
+// 	g := GitHubActionsConfigProvider{}
+// 	g.client = piperHttp.Client{}
+// 	g.client.SetOptions(piperHttp.ClientOptions{
+// 		BearerToken:      settings.GitHubToken,
+// 		MaxRetries:       3,
+// 		TransportTimeout: time.Second * 10,
+// 	})
+// 	return &g, nil
+// }
 
 func (g *GitHubActionsConfigProvider) OrchestratorVersion() string {
 	return "n/a"
