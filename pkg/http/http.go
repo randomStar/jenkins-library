@@ -37,6 +37,7 @@ type Client struct {
 	username                  string
 	password                  string
 	token                     string
+	bearerToken               string
 	logger                    *logrus.Entry
 	cookieJar                 http.CookieJar
 	doLogRequestBodyOnDebug   bool
@@ -62,6 +63,7 @@ type ClientOptions struct {
 	Username                  string
 	Password                  string
 	Token                     string
+	BearerToken               string
 	Logger                    *logrus.Entry
 	CookieJar                 http.CookieJar
 	DoLogRequestBodyOnDebug   bool
@@ -78,6 +80,7 @@ type TransportWrapper struct {
 	username                 string
 	password                 string
 	token                    string
+	bearerToken              string
 }
 
 // UploadRequestData encapsulates the parameters for calling uploader.Upload()
@@ -244,6 +247,7 @@ func (c *Client) SetOptions(options ClientOptions) {
 	c.username = options.Username
 	c.password = options.Password
 	c.token = options.Token
+	c.bearerToken = options.BearerToken
 	if options.MaxRetries < 0 {
 		c.maxRetries = 0
 	} else if options.MaxRetries == 0 {
@@ -292,6 +296,7 @@ func (c *Client) initialize() *http.Client {
 		doLogRequestBodyOnDebug:  c.doLogRequestBodyOnDebug,
 		doLogResponseBodyOnDebug: c.doLogResponseBodyOnDebug,
 		token:                    c.token,
+		bearerToken:              c.bearerToken,
 		username:                 c.username,
 		password:                 c.password,
 	}
@@ -324,7 +329,9 @@ func (c *Client) initialize() *http.Client {
 				doLogResponseBodyOnDebug: c.doLogResponseBodyOnDebug,
 				token:                    c.token,
 				username:                 c.username,
-				password:                 c.password}
+				password:                 c.password,
+				bearerToken:              c.bearerToken,
+			}
 		}
 		retryClient.CheckRetry = func(ctx context.Context, resp *http.Response, err error) (bool, error) {
 			if err != nil && (strings.Contains(err.Error(), "timeout") || strings.Contains(err.Error(), "timed out") || strings.Contains(err.Error(), "connection refused") || strings.Contains(err.Error(), "connection reset")) {
@@ -365,7 +372,7 @@ func (t *TransportWrapper) RoundTrip(req *http.Request) (*http.Response, error) 
 	ctx := context.WithValue(req.Context(), contextKeyRequestStart, time.Now())
 	req = req.WithContext(ctx)
 
-	handleAuthentication(req, t.username, t.password, t.token)
+	handleAuthentication(req, t.username, t.password, t.token, t.bearerToken)
 
 	t.logRequest(req)
 
@@ -376,7 +383,7 @@ func (t *TransportWrapper) RoundTrip(req *http.Request) (*http.Response, error) 
 	return resp, err
 }
 
-func handleAuthentication(req *http.Request, username, password, token string) {
+func handleAuthentication(req *http.Request, username, password, token, bearerToken string) {
 	// Handle authentication if not done already
 	if (len(username) > 0 || len(password) > 0) && len(req.Header.Get(authHeaderKey)) == 0 {
 		req.SetBasicAuth(username, password)
@@ -385,6 +392,10 @@ func handleAuthentication(req *http.Request, username, password, token string) {
 	if len(token) > 0 && len(req.Header.Get(authHeaderKey)) == 0 {
 		req.Header.Add(authHeaderKey, token)
 		log.Entry().Debug("Using Token Authentication ****")
+	}
+	if len(bearerToken) > 0 && len(req.Header.Get(authHeaderKey)) == 0 {
+		req.Header.Set(authHeaderKey, "Bearer "+bearerToken)
+		log.Entry().Info("Using Bearer Token Authentication ****")
 	}
 }
 
@@ -480,7 +491,7 @@ func (c *Client) createRequest(method, url string, body io.Reader, header *http.
 		}
 	}
 
-	handleAuthentication(request, c.username, c.password, c.token)
+	handleAuthentication(request, c.username, c.password, c.token, c.bearerToken)
 
 	for _, cookie := range cookies {
 		request.AddCookie(cookie)

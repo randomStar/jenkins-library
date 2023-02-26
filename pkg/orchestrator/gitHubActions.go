@@ -53,7 +53,7 @@ func gitHubActionsConfigProvider(settings *OrchestratorSettings) (*GitHubActions
 	g := GitHubActionsConfigProvider{}
 	g.client = piperHttp.Client{}
 	g.client.SetOptions(piperHttp.ClientOptions{
-		Password:         settings.GitHubToken,
+		BearerToken:      settings.GitHubToken,
 		MaxRetries:       3,
 		TransportTimeout: time.Second * 10,
 	})
@@ -79,6 +79,8 @@ func (g *GitHubActionsConfigProvider) GetLog() ([]byte, error) {
 		return nil, err
 	}
 
+	fmt.Println("ids: ", ids)
+
 	logs := Logs{
 		b: make([][]byte, len(ids)),
 	}
@@ -87,6 +89,7 @@ func (g *GitHubActionsConfigProvider) GetLog() ([]byte, error) {
 	sem := semaphore.NewWeighted(10)
 	wg := errgroup.Group{}
 	for i := range ids {
+		log.Entry().Println("yahooo!")
 		i := i // https://golang.org/doc/faq#closures_and_goroutines
 		if err := sem.Acquire(ctx, 1); err != nil {
 			return nil, fmt.Errorf("failed to acquire semaphore: %w", err)
@@ -207,7 +210,7 @@ func (g *GitHubActionsConfigProvider) GetStageIds() ([]int, error) {
 		ids[i] = job.ID
 	}
 	if len(ids) == 0 {
-		return nil, fmt.Errorf("failed to get logs")
+		return nil, fmt.Errorf("failed to get IDs")
 	}
 
 	// execution of the last stage hasn't finished yet - we can't get logs of the last stage
@@ -215,9 +218,7 @@ func (g *GitHubActionsConfigProvider) GetStageIds() ([]int, error) {
 }
 
 func (g *GitHubActionsConfigProvider) getHeader() http.Header {
-	header := http.Header{
-		"Accept":        {"application/vnd.github+json"},
-		"Authorization": {fmt.Sprintf("Bearer %s", getEnv("PIPER_ACTION_GITHUB_TOOLS_TOKEN", ""))},
+	return http.Header{
+		"Accept": {"application/vnd.github+json"},
 	}
-	return header
 }
