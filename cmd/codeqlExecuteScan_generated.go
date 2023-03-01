@@ -31,6 +31,9 @@ type codeqlExecuteScanOptions struct {
 	AnalyzedRef    string `json:"analyzedRef,omitempty"`
 	Repository     string `json:"repository,omitempty"`
 	CommitID       string `json:"commitId,omitempty"`
+	Ram            string `json:"ram,omitempty"`
+	Threads        string `json:"threads,omitempty"`
+	JavaOptions    string `json:"javaOptions,omitempty"`
 	Prestepcommand string `json:"prestepcommand,omitempty"`
 }
 
@@ -46,6 +49,7 @@ func (p *codeqlExecuteScanReports) persist(stepConfig codeqlExecuteScanOptions, 
 	content := []gcs.ReportOutputParam{
 		{FilePattern: "**/*.csv", ParamRef: "", StepResultType: "codeql"},
 		{FilePattern: "**/*.sarif", ParamRef: "", StepResultType: "codeql"},
+		{FilePattern: "**/toolrun_codeql_*.json", ParamRef: "", StepResultType: "codeql"},
 	}
 	envVars := []gcs.EnvVar{
 		{Name: "GOOGLE_APPLICATION_CREDENTIALS", Value: gcpJsonKeyFilePath, Modified: false},
@@ -181,6 +185,9 @@ func addCodeqlExecuteScanFlags(cmd *cobra.Command, stepConfig *codeqlExecuteScan
 	cmd.Flags().StringVar(&stepConfig.AnalyzedRef, "analyzedRef", os.Getenv("PIPER_analyzedRef"), "Name of the ref that was analyzed.")
 	cmd.Flags().StringVar(&stepConfig.Repository, "repository", os.Getenv("PIPER_repository"), "URL of the GitHub instance")
 	cmd.Flags().StringVar(&stepConfig.CommitID, "commitId", os.Getenv("PIPER_commitId"), "SHA of commit that was analyzed.")
+	cmd.Flags().StringVar(&stepConfig.Ram, "ram", os.Getenv("PIPER_ram"), "Testing purpose: Flag --ram for codeql commands")
+	cmd.Flags().StringVar(&stepConfig.Threads, "threads", os.Getenv("PIPER_threads"), "Testing purpose: Flag --threads for codeql commands")
+	cmd.Flags().StringVar(&stepConfig.JavaOptions, "javaOptions", os.Getenv("PIPER_javaOptions"), "Testing purpose: Flag -J for codeql commands")
 	cmd.Flags().StringVar(&stepConfig.Prestepcommand, "prestepcommand", os.Getenv("PIPER_prestepcommand"), "Testing purpose: Command to test before the codeql step")
 
 	cmd.MarkFlagRequired("buildTool")
@@ -331,6 +338,33 @@ func codeqlExecuteScanMetadata() config.StepData {
 						Default:   os.Getenv("PIPER_commitId"),
 					},
 					{
+						Name:        "ram",
+						ResourceRef: []config.ResourceReference{},
+						Scope:       []string{"PARAMETERS", "STAGES", "STEPS"},
+						Type:        "string",
+						Mandatory:   false,
+						Aliases:     []config.Alias{},
+						Default:     os.Getenv("PIPER_ram"),
+					},
+					{
+						Name:        "threads",
+						ResourceRef: []config.ResourceReference{},
+						Scope:       []string{"PARAMETERS", "STAGES", "STEPS"},
+						Type:        "string",
+						Mandatory:   false,
+						Aliases:     []config.Alias{},
+						Default:     os.Getenv("PIPER_threads"),
+					},
+					{
+						Name:        "javaOptions",
+						ResourceRef: []config.ResourceReference{},
+						Scope:       []string{"PARAMETERS", "STAGES", "STEPS"},
+						Type:        "string",
+						Mandatory:   false,
+						Aliases:     []config.Alias{},
+						Default:     os.Getenv("PIPER_javaOptions"),
+					},
+					{
 						Name:        "prestepcommand",
 						ResourceRef: []config.ResourceReference{},
 						Scope:       []string{"PARAMETERS", "STAGES", "STEPS"},
@@ -352,6 +386,7 @@ func codeqlExecuteScanMetadata() config.StepData {
 						Parameters: []map[string]interface{}{
 							{"filePattern": "**/*.csv", "type": "codeql"},
 							{"filePattern": "**/*.sarif", "type": "codeql"},
+							{"filePattern": "**/toolrun_codeql_*.json", "type": "codeql"},
 						},
 					},
 				},

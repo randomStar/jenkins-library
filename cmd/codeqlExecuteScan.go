@@ -4,13 +4,16 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"runtime"
 	"strings"
+	"time"
 
 	"github.com/SAP/jenkins-library/pkg/command"
 	"github.com/SAP/jenkins-library/pkg/log"
 	"github.com/SAP/jenkins-library/pkg/orchestrator"
 	"github.com/SAP/jenkins-library/pkg/piperutils"
 	"github.com/SAP/jenkins-library/pkg/telemetry"
+	"github.com/SAP/jenkins-library/pkg/toolrecord"
 	"github.com/pkg/errors"
 )
 
@@ -171,6 +174,8 @@ func uploadResults(config *codeqlExecuteScanOptions, utils codeqlExecuteScanUtil
 }
 
 func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telemetry.CustomData, utils codeqlExecuteScanUtils) error {
+
+	log.Entry().Infof("NumCPU: %q", runtime.NumCPU())
 	if len(config.Prestepcommand) > 0 {
 		preCommand := strings.Split(config.Prestepcommand, " ")
 
@@ -198,16 +203,29 @@ func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telem
 		cmd = append(cmd, "--language="+config.Language)
 	}
 
+	if len(config.Ram) > 0 {
+		cmd = append(cmd, "--ram="+config.Ram)
+	}
+	if len(config.Threads) > 0 {
+		cmd = append(cmd, "--threads="+config.Threads)
+	}
+	if len(config.JavaOptions) > 0 {
+		cmd = append(cmd, "-J="+config.JavaOptions)
+	}
+
 	//codeql has an autobuilder which tries to build the project based on specified programming language
 	if len(config.BuildCommand) > 0 {
 		cmd = append(cmd, "--command="+config.BuildCommand)
 	}
-
+	start := time.Now()
 	err := execute(utils, cmd, GeneralConfig.Verbose)
 	if err != nil {
 		log.Entry().Error("failed running command codeql database create")
 		return err
 	}
+	t := time.Now()
+	log.Entry().Infof("database create duration: %q", t.Sub(start))
+	log.Entry().Warn("database create finished")
 
 	err = os.MkdirAll(fmt.Sprintf("%vtarget", config.ModulePath), os.ModePerm)
 	if err != nil {
@@ -216,33 +234,157 @@ func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telem
 
 	cmd = nil
 	cmd = append(cmd, "database", "analyze", "--format=sarif-latest", fmt.Sprintf("--output=%vtarget/codeqlReport.sarif", config.ModulePath), config.Database)
+
+	if len(config.Ram) > 0 {
+		cmd = append(cmd, "--ram="+config.Ram)
+	}
+	if len(config.Threads) > 0 {
+		cmd = append(cmd, "--threads="+config.Threads)
+	}
+	if len(config.JavaOptions) > 0 {
+		cmd = append(cmd, "-J="+config.JavaOptions)
+	}
+
 	cmd = codeqlQuery(cmd, config.QuerySuite)
+	start = time.Now()
 	err = execute(utils, cmd, GeneralConfig.Verbose)
 	if err != nil {
 		log.Entry().Error("failed running command codeql database analyze for sarif generation")
 		return err
 	}
+	t = time.Now()
+	log.Entry().Infof("database analyze sarif duration: %q", t.Sub(start))
+	log.Entry().Warn("database analyze sarif finished")
 
 	reports = append(reports, piperutils.Path{Target: fmt.Sprintf("%vtarget/codeqlReport.sarif", config.ModulePath)})
 
 	cmd = nil
 	cmd = append(cmd, "database", "analyze", "--format=csv", fmt.Sprintf("--output=%vtarget/codeqlReport.csv", config.ModulePath), config.Database)
+
+	if len(config.Ram) > 0 {
+		cmd = append(cmd, "--ram="+config.Ram)
+	}
+	if len(config.Threads) > 0 {
+		cmd = append(cmd, "--threads="+config.Threads)
+	}
+	if len(config.JavaOptions) > 0 {
+		cmd = append(cmd, "-J="+config.JavaOptions)
+	}
+
 	cmd = codeqlQuery(cmd, config.QuerySuite)
+	start = time.Now()
 	err = execute(utils, cmd, GeneralConfig.Verbose)
 	if err != nil {
 		log.Entry().Error("failed running command codeql database analyze for csv generation")
 		return err
 	}
+	t = time.Now()
+	log.Entry().Infof("database analyze csv duration: %q", t.Sub(start))
+	log.Entry().Warn("database analyze csv finished")
 
 	reports = append(reports, piperutils.Path{Target: fmt.Sprintf("%vtarget/codeqlReport.csv", config.ModulePath)})
-
-	piperutils.PersistReportsAndLinks("codeqlExecuteScan", "./", utils, reports, nil)
-
 	err = uploadResults(config, utils)
 	if err != nil {
 		log.Entry().Error("failed to upload results")
 		return err
 	}
 
+	// create toolrecord file
+	toolRecordFileName, err := createToolRecordCodeql(utils, "./", *config)
+	if err != nil {
+		// do not fail until the framework is well established
+		log.Entry().Warning("TR_CODEQL: Failed to create toolrecord file ...", err)
+	} else {
+		reports = append(reports, piperutils.Path{Target: toolRecordFileName})
+	}
+
+	piperutils.PersistReportsAndLinks("codeqlExecuteScan", "./", utils, reports, nil)
+
 	return nil
+}
+
+func createToolRecordCodeql(utils codeqlExecuteScanUtils, workspace string, config codeqlExecuteScanOptions) (string, error) {
+	repoURL := strings.TrimSuffix(config.Repository, ".git")
+	toolInstance, orgName, repoName, err := parseRepositoryURL(repoURL)
+	if err != nil {
+		return "", err
+	}
+	record := toolrecord.New(utils, workspace, "codeql", toolInstance)
+	record.DisplayName = fmt.Sprintf("%s %s - %s %s", orgName, repoName, config.AnalyzedRef, config.CommitID)
+	record.DisplayURL = fmt.Sprintf("%s/security/code-scanning?query=is:open+ref:%s", repoURL, config.AnalyzedRef)
+	// Repository
+	err = record.AddKeyData("repository",
+		fmt.Sprintf("%s/%s", orgName, repoName),
+		fmt.Sprintf("%s %s", orgName, repoName),
+		config.Repository)
+	if err != nil {
+		return "", err
+	}
+	// Repository Reference
+	repoReference, err := buildRepoReference(repoURL, config.AnalyzedRef)
+	if err != nil {
+		log.Entry().WithError(err).Warn("Failed to build repository reference")
+	}
+	err = record.AddKeyData("repositoryReference",
+		config.AnalyzedRef,
+		fmt.Sprintf("%s - %s", repoName, config.AnalyzedRef),
+		repoReference)
+	if err != nil {
+		return "", err
+	}
+	// Scan Results
+	err = record.AddKeyData("scanResult",
+		fmt.Sprintf("%s/%s", config.AnalyzedRef, config.CommitID),
+		fmt.Sprintf("%s %s - %s %s", orgName, repoName, config.AnalyzedRef, config.CommitID),
+		fmt.Sprintf("%s/security/code-scanning?query=is:open+ref:%s", repoURL, config.AnalyzedRef))
+	if err != nil {
+		return "", err
+	}
+	err = record.Persist()
+	if err != nil {
+		return "", err
+	}
+	return record.GetFileName(), nil
+}
+
+func parseRepositoryURL(repository string) (toolInstance, orgName, repoName string, err error) {
+	if repository == "" {
+		err = errors.New("Repository param is not set")
+		return
+	}
+	fullRepo := strings.TrimSuffix(repository, ".git")
+	// regexp for toolInstance
+	re := regexp.MustCompile(`^[a-zA-Z0-9]+://[a-zA-Z0-9-_.]+/`)
+	matchedHost := re.FindAllString(fullRepo, -1)
+	if len(matchedHost) == 0 {
+		err = errors.New("Unable to parse tool instance from repository url")
+		return
+	}
+	orgRepoNames := strings.Split(strings.TrimPrefix(fullRepo, matchedHost[0]), "/")
+	if len(orgRepoNames) < 2 {
+		err = errors.New("Unable to parse organization and repo names from repository url")
+		return
+	}
+
+	toolInstance = strings.Trim(matchedHost[0], "/")
+	orgName = orgRepoNames[0]
+	repoName = orgRepoNames[1]
+	return
+}
+
+func buildRepoReference(repository, analyzedRef string) (string, error) {
+	if repository == "" || analyzedRef == "" {
+		return "", errors.New("Repository or analyzedRef param is not set")
+	}
+	ref := strings.Split(analyzedRef, "/")
+	if len(ref) < 3 {
+		return "", errors.New(fmt.Sprintf("Wrong analyzedRef format: %s", analyzedRef))
+	}
+	if strings.Contains(analyzedRef, "pull") {
+		if len(ref) < 4 {
+			return "", errors.New(fmt.Sprintf("Wrong analyzedRef format: %s", analyzedRef))
+		}
+		return fmt.Sprintf("%s/pull/%s", repository, ref[2]), nil
+	}
+	return fmt.Sprintf("%s/tree/%s", repository, ref[2]), nil
 }
