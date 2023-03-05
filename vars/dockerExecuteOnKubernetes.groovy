@@ -280,9 +280,9 @@ def getOptions(config) {
     if (config.nodeSelector) {
         options.nodeSelector = config.nodeSelector
     }
-    if (!config.verbose) {
-        options.showRawYaml = false
-    }
+    // if (!config.verbose) {
+        options.showRawYaml = true
+    // }
 
     if(config.jenkinsKubernetes.inheritFrom){
         options.inheritFrom = config.jenkinsKubernetes.inheritFrom
