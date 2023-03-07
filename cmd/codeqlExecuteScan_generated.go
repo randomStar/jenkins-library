@@ -33,7 +33,8 @@ type codeqlExecuteScanOptions struct {
 	CommitID       string `json:"commitId,omitempty"`
 	Ram            string `json:"ram,omitempty"`
 	Threads        string `json:"threads,omitempty"`
-	JavaOptions    string `json:"javaOptions,omitempty"`
+	JavaOptionsXmx string `json:"javaOptionsXmx,omitempty"`
+	JavaOptionsXms string `json:"javaOptionsXms,omitempty"`
 	Prestepcommand string `json:"prestepcommand,omitempty"`
 }
 
@@ -187,7 +188,8 @@ func addCodeqlExecuteScanFlags(cmd *cobra.Command, stepConfig *codeqlExecuteScan
 	cmd.Flags().StringVar(&stepConfig.CommitID, "commitId", os.Getenv("PIPER_commitId"), "SHA of commit that was analyzed.")
 	cmd.Flags().StringVar(&stepConfig.Ram, "ram", os.Getenv("PIPER_ram"), "Testing purpose: Flag --ram for codeql commands")
 	cmd.Flags().StringVar(&stepConfig.Threads, "threads", os.Getenv("PIPER_threads"), "Testing purpose: Flag --threads for codeql commands")
-	cmd.Flags().StringVar(&stepConfig.JavaOptions, "javaOptions", os.Getenv("PIPER_javaOptions"), "Testing purpose: Flag -J for codeql commands")
+	cmd.Flags().StringVar(&stepConfig.JavaOptionsXmx, "javaOptionsXmx", os.Getenv("PIPER_javaOptionsXmx"), "Testing purpose: Flag -J=-Xmx for codeql commands")
+	cmd.Flags().StringVar(&stepConfig.JavaOptionsXms, "javaOptionsXms", os.Getenv("PIPER_javaOptionsXms"), "Testing purpose: Flag -J=-Xms for codeql commands")
 	cmd.Flags().StringVar(&stepConfig.Prestepcommand, "prestepcommand", os.Getenv("PIPER_prestepcommand"), "Testing purpose: Command to test before the codeql step")
 
 	cmd.MarkFlagRequired("buildTool")
@@ -356,13 +358,22 @@ func codeqlExecuteScanMetadata() config.StepData {
 						Default:     os.Getenv("PIPER_threads"),
 					},
 					{
-						Name:        "javaOptions",
+						Name:        "javaOptionsXmx",
 						ResourceRef: []config.ResourceReference{},
 						Scope:       []string{"PARAMETERS", "STAGES", "STEPS"},
 						Type:        "string",
 						Mandatory:   false,
 						Aliases:     []config.Alias{},
-						Default:     os.Getenv("PIPER_javaOptions"),
+						Default:     os.Getenv("PIPER_javaOptionsXmx"),
+					},
+					{
+						Name:        "javaOptionsXms",
+						ResourceRef: []config.ResourceReference{},
+						Scope:       []string{"PARAMETERS", "STAGES", "STEPS"},
+						Type:        "string",
+						Mandatory:   false,
+						Aliases:     []config.Alias{},
+						Default:     os.Getenv("PIPER_javaOptionsXms"),
 					},
 					{
 						Name:        "prestepcommand",

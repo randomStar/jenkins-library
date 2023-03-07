@@ -209,8 +209,11 @@ func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telem
 	if len(config.Threads) > 0 {
 		cmd = append(cmd, "--threads="+config.Threads)
 	}
-	if len(config.JavaOptions) > 0 {
-		cmd = append(cmd, "-J="+config.JavaOptions)
+	if len(config.JavaOptionsXmx) > 0 {
+		cmd = append(cmd, "-J="+config.JavaOptionsXmx)
+	}
+	if len(config.JavaOptionsXms) > 0 {
+		cmd = append(cmd, "-J="+config.JavaOptionsXms)
 	}
 
 	//codeql has an autobuilder which tries to build the project based on specified programming language
@@ -241,8 +244,11 @@ func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telem
 	if len(config.Threads) > 0 {
 		cmd = append(cmd, "--threads="+config.Threads)
 	}
-	if len(config.JavaOptions) > 0 {
-		cmd = append(cmd, "-J="+config.JavaOptions)
+	if len(config.JavaOptionsXmx) > 0 {
+		cmd = append(cmd, "-J="+config.JavaOptionsXmx)
+	}
+	if len(config.JavaOptionsXms) > 0 {
+		cmd = append(cmd, "-J="+config.JavaOptionsXms)
 	}
 
 	cmd = codeqlQuery(cmd, config.QuerySuite)
@@ -267,8 +273,11 @@ func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telem
 	if len(config.Threads) > 0 {
 		cmd = append(cmd, "--threads="+config.Threads)
 	}
-	if len(config.JavaOptions) > 0 {
-		cmd = append(cmd, "-J="+config.JavaOptions)
+	if len(config.JavaOptionsXmx) > 0 {
+		cmd = append(cmd, "-J="+config.JavaOptionsXmx)
+	}
+	if len(config.JavaOptionsXms) > 0 {
+		cmd = append(cmd, "-J="+config.JavaOptionsXms)
 	}
 
 	cmd = codeqlQuery(cmd, config.QuerySuite)

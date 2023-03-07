@@ -142,9 +142,16 @@ spec:
           - PARAMETERS
           - STAGES
           - STEPS
-      - name: javaOptions
+      - name: javaOptionsXmx
         type: string
-        description: "Testing purpose: Flag -J for codeql commands"
+        description: "Testing purpose: Flag -J=-Xmx for codeql commands"
+        scope:
+          - PARAMETERS
+          - STAGES
+          - STEPS
+      - name: javaOptionsXms
+        type: string
+        description: "Testing purpose: Flag -J=-Xms for codeql commands"
         scope:
           - PARAMETERS
           - STAGES
