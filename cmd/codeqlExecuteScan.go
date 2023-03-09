@@ -227,8 +227,8 @@ func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telem
 		return err
 	}
 	t := time.Now()
-	log.Entry().Infof("database create duration: %q", t.Sub(start))
-	log.Entry().Warn("database create finished")
+	dur1 := t.Sub(start)
+	log.Entry().Infof("database create duration: %q", dur1)
 
 	err = os.MkdirAll(fmt.Sprintf("%vtarget", config.ModulePath), os.ModePerm)
 	if err != nil {
@@ -259,8 +259,8 @@ func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telem
 		return err
 	}
 	t = time.Now()
-	log.Entry().Infof("database analyze sarif duration: %q", t.Sub(start))
-	log.Entry().Warn("database analyze sarif finished")
+	dur2 := t.Sub(start)
+	log.Entry().Infof("database analyze sarif duration: %q", dur2)
 
 	reports = append(reports, piperutils.Path{Target: fmt.Sprintf("%vtarget/codeqlReport.sarif", config.ModulePath)})
 
@@ -287,9 +287,9 @@ func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telem
 		log.Entry().Error("failed running command codeql database analyze for csv generation")
 		return err
 	}
-	t = time.Now()
-	log.Entry().Infof("database analyze csv duration: %q", t.Sub(start))
-	log.Entry().Warn("database analyze csv finished")
+	dur3 := t.Sub(start)
+	log.Entry().Infof("database analyze csv duration: %q", dur3)
+	log.Entry().Infof("database create and analyze duration: %q", dur1+dur2+dur3)
 
 	reports = append(reports, piperutils.Path{Target: fmt.Sprintf("%vtarget/codeqlReport.csv", config.ModulePath)})
 	err = uploadResults(config, utils)
