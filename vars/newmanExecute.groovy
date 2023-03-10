@@ -48,6 +48,8 @@ void call(Map parameters = [:]) {
         parameters.stashContent = [GitUtils.handleTestRepository(this, [gitBranch: config.gitBranch, gitSshKeyCredentialsId: config.gitSshKeyCredentialsId, testRepository: config.testRepository])]
     }
 
+    echo "config: ${config}"
+
     List<String> cfCredentials = []
     if (config.cfAppsWithSecrets) {
         CloudFoundry cfUtils = new CloudFoundry(script);
