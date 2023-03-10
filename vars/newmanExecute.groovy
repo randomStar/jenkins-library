@@ -48,10 +48,13 @@ void call(Map parameters = [:]) {
         parameters.stashContent = [GitUtils.handleTestRepository(this, [gitBranch: config.gitBranch, gitSshKeyCredentialsId: config.gitSshKeyCredentialsId, testRepository: config.testRepository])]
     }
 
-    echo "config: ${config}"
+    echo "---config: ${config}"
 
     List<String> cfCredentials = []
     if (config.cfAppsWithSecrets) {
+
+        echo "---one---"
+
         CloudFoundry cfUtils = new CloudFoundry(script);
         config.cfAppsWithSecrets.each { appName ->
             def xsuaaCredentials = cfUtils.getXsuaaCredentials(config.cloudFoundry.apiEndpoint,
