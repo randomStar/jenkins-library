@@ -272,7 +272,11 @@ func untar(r io.Reader, dir string, level int) (err error) {
 		if !validRelPath(f.Name) { // blocks path traversal attacks
 			return fmt.Errorf("tar contained invalid name error %q", f.Name)
 		}
+
+		// ***
+		fmt.Println("---f.Name:", f.Name)
 		rel := filepath.FromSlash(f.Name)
+		fmt.Println("---rel:", rel)
 
 		// when level X folder(s) needs to be removed we first check that the rel path must have atleast X or greater than X pathseperatorserr
 		// or else we might end in index out of range
@@ -285,7 +289,9 @@ func untar(r io.Reader, dir string, level int) (err error) {
 			}
 		}
 
+		// ***
 		abs := filepath.Join(dir, rel)
+		fmt.Println("---abs:", abs)
 
 		fi := f.FileInfo()
 		mode := fi.Mode()
