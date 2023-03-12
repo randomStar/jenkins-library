@@ -55,18 +55,18 @@ void call(Map parameters = [:]) {
 
         echo "---one---"
 
-        CloudFoundry cfUtils = new CloudFoundry(script);
-        config.cfAppsWithSecrets.each { appName ->
-            def xsuaaCredentials = cfUtils.getXsuaaCredentials(config.cloudFoundry.apiEndpoint,
-                                                            config.cloudFoundry.org,
-                                                            config.cloudFoundry.space,
-                                                            config.cloudFoundry.credentialsId,
-                                                            appName,
-                                                            config.verbose ? true : false )
-            cfCredentials.add("PIPER_NEWMANEXECUTE_${appName}_clientid=${xsuaaCredentials.clientid}")
-            cfCredentials.add("PIPER_NEWMANEXECUTE_${appName}_clientsecret=${xsuaaCredentials.clientsecret}")
-            echo "Exposing client id and secret for ${appName}: as ${appName}_clientid and ${appName}_clientsecret to newmanExecute"
-        }
+        // CloudFoundry cfUtils = new CloudFoundry(script);
+        // config.cfAppsWithSecrets.each { appName ->
+        //     def xsuaaCredentials = cfUtils.getXsuaaCredentials(config.cloudFoundry.apiEndpoint,
+        //                                                     config.cloudFoundry.org,
+        //                                                     config.cloudFoundry.space,
+        //                                                     config.cloudFoundry.credentialsId,
+        //                                                     appName,
+        //                                                     config.verbose ? true : false )
+        //     cfCredentials.add("PIPER_NEWMANEXECUTE_${appName}_clientid=${xsuaaCredentials.clientid}")
+        //     cfCredentials.add("PIPER_NEWMANEXECUTE_${appName}_clientsecret=${xsuaaCredentials.clientsecret}")
+        //     echo "Exposing client id and secret for ${appName}: as ${appName}_clientid and ${appName}_clientsecret to newmanExecute"
+        // }
     }
     withEnv(cfCredentials) {
         piperExecuteBin(parameters, STEP_NAME, METADATA_FILE, [])
