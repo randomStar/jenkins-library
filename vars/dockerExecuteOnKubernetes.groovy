@@ -557,7 +557,7 @@ private List getContainerList(config) {
             image          : config.sidecarImage,
             imagePullPolicy: config.sidecarPullImage ? "Always" : "IfNotPresent",
             env            : getContainerEnvs(config, config.sidecarImage, config.sidecarEnvVars, config.sidecarWorkspace),
-            command        : ["app"]
+            command        : []
         ]
         def resources = getResources(sideCarContainerName, config)
         if(resources) {
