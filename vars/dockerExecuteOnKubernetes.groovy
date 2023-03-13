@@ -503,6 +503,10 @@ private List getContainerList(config) {
     echo "---containerMap: ${config.containerMap}"
 
     config.containerMap.each { imageName, containerName ->
+
+        echo "---imageName: ${imageName}"
+        echo "---containerName: ${containerName}" 
+
         def containerPullImage = config.containerPullImageFlags?.get(imageName)
         boolean pullImage = containerPullImage != null ? containerPullImage : config.dockerPullImage
         def containerSpec = [
@@ -516,6 +520,9 @@ private List getContainerList(config) {
         }
 
         def configuredCommand = config.containerCommands?.get(imageName)
+
+        echo "---configuredCommand: ${configuredCommand}"
+        
         def shell = config.containerShell ?: '/bin/sh'
         if (configuredCommand == null) {
             containerSpec['command'] = [
