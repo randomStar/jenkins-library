@@ -499,6 +499,9 @@ private List getContainerList(config) {
 
         result.push(jnlpSpec)
     }
+
+    echo "---containerMap: ${config.containerMap}"
+
     config.containerMap.each { imageName, containerName ->
         def containerPullImage = config.containerPullImageFlags?.get(imageName)
         boolean pullImage = containerPullImage != null ? containerPullImage : config.dockerPullImage
