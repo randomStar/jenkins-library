@@ -319,6 +319,7 @@ func TestGetReleaseDeltaText(t *testing.T) {
 		Repository: "test",
 		ServerURL:  "https://github.com",
 		Version:    "1.1",
+		TagPrefix:  "rel/",
 	}
 	lastTag := "1.0"
 	lastRelease := github.RepositoryRelease{
@@ -327,7 +328,7 @@ func TestGetReleaseDeltaText(t *testing.T) {
 
 	res := getReleaseDeltaText(&myGithubPublishReleaseOptions, &lastRelease)
 
-	assert.Equal(t, "\n**Changes**\n[1.0...1.1](https://github.com/TEST/test/compare/1.0...1.1)\n", res)
+	assert.Equal(t, "\n**Changes**\n[1.0...rel/1.1](https://github.com/TEST/test/compare/1.0...rel/1.1)\n", res)
 }
 
 func TestUploadReleaseAsset(t *testing.T) {
