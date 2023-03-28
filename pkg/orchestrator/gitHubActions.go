@@ -1,16 +1,11 @@
 package orchestrator
 
 import (
-<<<<<<< HEAD
-	"fmt"
-	"os"
-=======
 	"bytes"
 	"context"
 	"fmt"
 	"io"
 	"net/http"
->>>>>>> master
 	"strings"
 	"sync"
 	"time"
