@@ -66,8 +66,16 @@ void call(Map parameters = [:]) {
                         withEnv(environment) {
                             influxWrapper(script) {
                                 piperExecuteBin.credentialWrapper(config, credentialInfo) {
+
+                                    echo "stepConfig.instance: ${stepConfig.instance}"
+                                    
                                     if (stepConfig.instance) {
                                         withSonarQubeEnv(stepConfig.instance) {
+
+                                            echo "case1"
+                                            echo "sonar host url: ${env.SONAR_HOST_URL}"
+                                            echo "sonar auth token: ${env.SONAR_AUTH_TOKEN}"
+
                                             echo "Instance is deprecated - please use serverUrl parameter to set URL to the Sonar backend."
                                             sh "${piperGoPath} ${STEP_NAME}${customDefaultConfig}${customConfigArg}"
                                             archiveArtifacts artifacts: "sonarscan.json", allowEmptyArchive: true
@@ -75,6 +83,8 @@ void call(Map parameters = [:]) {
                                             readPipelineEnv(script: script, piperGoPath: piperGoPath)
                                         }
                                     } else {
+                                        echo "case2"
+
                                         sh "${piperGoPath} ${STEP_NAME}${customDefaultConfig}${customConfigArg}"
                                     }
                                 }
