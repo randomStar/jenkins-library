@@ -188,6 +188,9 @@ func runSonar(config sonarExecuteScanOptions, client piperhttp.Downloader, runne
 		Debug("Executing sonar scan command")
 	// execute scan
 	runner.SetEnv(sonar.environment)
+
+	log.Entry().Debugf("---sonar.environment: \n", sonar.environment)
+
 	err := runner.RunExecutable(sonar.binary, sonar.options...)
 	if err != nil {
 		return err
