@@ -504,7 +504,7 @@ func defineKubeSecretParams(config kubernetesDeployOptions, containerRegistry st
 		fmt.Sprintf("--from-file=.dockerconfigjson=%v", targetPath),
 		"--type=kubernetes.io/dockerconfigjson",
 		"--insecure-skip-tls-verify=true",
-		"--dry-run=client",
+		"--dry-run=true",
 		"--output=json",
 	}
 }
