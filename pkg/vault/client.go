@@ -218,10 +218,17 @@ func (v *Client) GenerateNewAppRoleSecret(secretID, appRoleName string) (string,
 // GetAppRoleSecretIDTtl returns the remaining time until the given secret-id expires
 func (v *Client) GetAppRoleSecretIDTtl(secretID, roleName string) (time.Duration, error) {
 	appRolePath := v.getAppRolePath(roleName)
+
+	// ***
+	fmt.Printf("\n---appRolePath: %v\n", appRolePath)
+
 	data, err := v.lookupSecretID(secretID, appRolePath)
 	if err != nil {
 		return 0, err
 	}
+
+	// ***
+	fmt.Printf("\n---data: %+v\n", data)
 
 	if data == nil || data["expiration_time"] == nil {
 		return 0, fmt.Errorf("Could not load secret-id information from path %s", appRolePath)
