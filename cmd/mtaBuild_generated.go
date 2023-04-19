@@ -152,7 +152,6 @@ func MtaBuildCommand() *cobra.Command {
 				log.SetErrorCategory(log.ErrorConfiguration)
 				return err
 			}
-			log.Entry().Debugf("step configs: %+v\n", stepConfig)
 			log.RegisterSecret(stepConfig.MtaDeploymentRepositoryPassword)
 
 			if len(GeneralConfig.HookConfig.SentryConfig.Dsn) > 0 {
