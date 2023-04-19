@@ -4,9 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
-	"runtime"
 	"strings"
-	"time"
 
 	"github.com/SAP/jenkins-library/pkg/command"
 	"github.com/SAP/jenkins-library/pkg/log"
@@ -93,12 +91,12 @@ func getGitRepoInfo(repoUri string, repoInfo *RepoInfo) error {
 		return errors.New("repository param is not set or it cannot be auto populated")
 	}
 
-	pat := regexp.MustCompile(`^(https|git)(:\/\/|@)([^\/:]+)[\/:]([^\/:]+\/[^.]+)(.git)*$`)
+	pat := regexp.MustCompile(`^(https|git):\/\/([\S]+:[\S]+@)?([^\/:]+)[\/:]([^\/:]+\/[\S]+)$`)
 	matches := pat.FindAllStringSubmatch(repoUri, -1)
 	if len(matches) > 0 {
 		match := matches[0]
 		repoInfo.serverUrl = "https://" + match[3]
-		repoInfo.repo = match[4]
+		repoInfo.repo = strings.TrimSuffix(match[4], ".git")
 		return nil
 	}
 
@@ -174,14 +172,11 @@ func uploadResults(config *codeqlExecuteScanOptions, utils codeqlExecuteScanUtil
 }
 
 func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telemetry.CustomData, utils codeqlExecuteScanUtils) error {
-
-	log.Entry().Infof("NumCPU: %q", runtime.NumCPU())
-	if len(config.Prestepcommand) > 0 {
-		preCommand := strings.Split(config.Prestepcommand, " ")
-
-		if err := utils.RunExecutable(preCommand[0], preCommand[1:]...); err != nil {
-			return errors.Wrap(err, "failed to run preStepCommand")
-		}
+	codeqlVersion, err := os.ReadFile("/etc/image-version")
+	if err != nil {
+		log.Entry().Infof("CodeQL image version: unknown")
+	} else {
+		log.Entry().Infof("CodeQL image version: %s", string(codeqlVersion))
 	}
 
 	var reports []piperutils.Path
@@ -196,39 +191,24 @@ func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telem
 			return fmt.Errorf("the step could not recognize the specified buildTool %s. please specify valid buildtool", config.BuildTool)
 		}
 	}
-
 	if len(language) > 0 {
 		cmd = append(cmd, "--language="+language)
-	} else if len(config.Language) > 0 {
+	} else {
 		cmd = append(cmd, "--language="+config.Language)
 	}
 
-	if len(config.Ram) > 0 {
-		cmd = append(cmd, "--ram="+config.Ram)
-	}
-	if len(config.Threads) > 0 {
-		cmd = append(cmd, "--threads="+config.Threads)
-	}
-	if len(config.JavaOptionsXmx) > 0 {
-		cmd = append(cmd, "-J="+config.JavaOptionsXmx)
-	}
-	if len(config.JavaOptionsXms) > 0 {
-		cmd = append(cmd, "-J="+config.JavaOptionsXms)
-	}
+	cmd = append(cmd, getRamAndThreadsFromConfig(config)...)
 
 	//codeql has an autobuilder which tries to build the project based on specified programming language
 	if len(config.BuildCommand) > 0 {
 		cmd = append(cmd, "--command="+config.BuildCommand)
 	}
-	start := time.Now()
-	err := execute(utils, cmd, GeneralConfig.Verbose)
+
+	err = execute(utils, cmd, GeneralConfig.Verbose)
 	if err != nil {
 		log.Entry().Error("failed running command codeql database create")
 		return err
 	}
-	t := time.Now()
-	dur1 := t.Sub(start)
-	log.Entry().Infof("database create duration: %q", dur1)
 
 	err = os.MkdirAll(fmt.Sprintf("%vtarget", config.ModulePath), os.ModePerm)
 	if err != nil {
@@ -237,59 +217,25 @@ func runCodeqlExecuteScan(config *codeqlExecuteScanOptions, telemetryData *telem
 
 	cmd = nil
 	cmd = append(cmd, "database", "analyze", "--format=sarif-latest", fmt.Sprintf("--output=%vtarget/codeqlReport.sarif", config.ModulePath), config.Database)
-
-	if len(config.Ram) > 0 {
-		cmd = append(cmd, "--ram="+config.Ram)
-	}
-	if len(config.Threads) > 0 {
-		cmd = append(cmd, "--threads="+config.Threads)
-	}
-	if len(config.JavaOptionsXmx) > 0 {
-		cmd = append(cmd, "-J="+config.JavaOptionsXmx)
-	}
-	if len(config.JavaOptionsXms) > 0 {
-		cmd = append(cmd, "-J="+config.JavaOptionsXms)
-	}
-
+	cmd = append(cmd, getRamAndThreadsFromConfig(config)...)
 	cmd = codeqlQuery(cmd, config.QuerySuite)
-	start = time.Now()
 	err = execute(utils, cmd, GeneralConfig.Verbose)
 	if err != nil {
 		log.Entry().Error("failed running command codeql database analyze for sarif generation")
 		return err
 	}
-	t = time.Now()
-	dur2 := t.Sub(start)
-	log.Entry().Infof("database analyze sarif duration: %q", dur2)
 
 	reports = append(reports, piperutils.Path{Target: fmt.Sprintf("%vtarget/codeqlReport.sarif", config.ModulePath)})
 
 	cmd = nil
 	cmd = append(cmd, "database", "analyze", "--format=csv", fmt.Sprintf("--output=%vtarget/codeqlReport.csv", config.ModulePath), config.Database)
-
-	if len(config.Ram) > 0 {
-		cmd = append(cmd, "--ram="+config.Ram)
-	}
-	if len(config.Threads) > 0 {
-		cmd = append(cmd, "--threads="+config.Threads)
-	}
-	if len(config.JavaOptionsXmx) > 0 {
-		cmd = append(cmd, "-J="+config.JavaOptionsXmx)
-	}
-	if len(config.JavaOptionsXms) > 0 {
-		cmd = append(cmd, "-J="+config.JavaOptionsXms)
-	}
-
+	cmd = append(cmd, getRamAndThreadsFromConfig(config)...)
 	cmd = codeqlQuery(cmd, config.QuerySuite)
-	start = time.Now()
 	err = execute(utils, cmd, GeneralConfig.Verbose)
 	if err != nil {
 		log.Entry().Error("failed running command codeql database analyze for csv generation")
 		return err
 	}
-	dur3 := t.Sub(start)
-	log.Entry().Infof("database analyze csv duration: %q", dur3)
-	log.Entry().Infof("database create and analyze duration: %q", dur1+dur2+dur3)
 
 	reports = append(reports, piperutils.Path{Target: fmt.Sprintf("%vtarget/codeqlReport.csv", config.ModulePath)})
 	err = uploadResults(config, utils)
@@ -396,4 +342,15 @@ func buildRepoReference(repository, analyzedRef string) (string, error) {
 		return fmt.Sprintf("%s/pull/%s", repository, ref[2]), nil
 	}
 	return fmt.Sprintf("%s/tree/%s", repository, ref[2]), nil
+}
+
+func getRamAndThreadsFromConfig(config *codeqlExecuteScanOptions) []string {
+	params := make([]string, 0, 2)
+	if len(config.Threads) > 0 {
+		params = append(params, "--threads="+config.Threads)
+	}
+	if len(config.Ram) > 0 {
+		params = append(params, "--ram="+config.Ram)
+	}
+	return params
 }
