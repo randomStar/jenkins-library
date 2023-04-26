@@ -115,12 +115,7 @@ func generateDefaults(utils getDefaultsUtils) ([]byte, error) {
 		return jsonOutput, err
 	}
 
-	if len(yamlDefaults) > 1 {
-		jsonOutput, err = json.Marshal(yamlDefaults)
-	} else {
-		jsonOutput, err = json.Marshal(yamlDefaults[0])
-	}
-
+	jsonOutput, err = json.Marshal(yamlDefaults)
 	if err != nil {
 		return jsonOutput, errors.Wrapf(err, "defaults: could not embed YAML defaults into JSON")
 	}

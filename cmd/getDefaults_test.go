@@ -93,7 +93,7 @@ func TestGenerateDefaults(t *testing.T) {
 		{
 			name:          "Single defaults file",
 			defaultsFiles: []string{"test"},
-			expected:      `{"content":"general: null\nstages: null\nsteps: null\n","filepath":"test"}`,
+			expected:      `[{"content":"general: null\nstages: null\nsteps: null\n","filepath":"test"}]`,
 		},
 		{
 			name:          "Multiple defaults files",
@@ -105,7 +105,7 @@ func TestGenerateDefaults(t *testing.T) {
 			name:          "Single file + useV1",
 			defaultsFiles: []string{"stage_conditions.yaml"},
 			useV1:         true,
-			expected:      `{"content":` + stageConditionsExpected + `,"filepath":"stage_conditions.yaml"}`,
+			expected:      `[{"content":` + stageConditionsExpected + `,"filepath":"stage_conditions.yaml"}]`,
 		},
 		{
 			name:          "Multiple files + useV1",
