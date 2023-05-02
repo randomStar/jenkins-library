@@ -131,6 +131,8 @@ func runSonar(config sonarExecuteScanOptions, client piperhttp.Downloader, runne
 	// Set config based on orchestrator-specific environment variables
 	detectParametersFromCI(&config)
 
+	var serverUrl String
+
 	if len(config.ServerURL) > 0 {
 		sonar.addEnvironment("SONAR_HOST_URL=" + config.ServerURL)
 	}
@@ -218,8 +220,6 @@ func runSonar(config sonarExecuteScanOptions, client piperhttp.Downloader, runne
 		log.Entry().WithError(err).Warning("no scan report found")
 		return nil
 	}
-
-	var serverUrl String
 
 	if len(config.ServerURL) > 0 {
 	serverUrl := config.ServerURL
