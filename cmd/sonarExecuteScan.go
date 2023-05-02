@@ -115,8 +115,6 @@ func sonarExecuteScan(config sonarExecuteScanOptions, _ *telemetry.CustomData, i
 		options:     []string{},
 	}
 
-	 serverUrl := ""
-
 	influx.step_data.fields.sonar = false
 	fileUtils := piperutils.Files{}
 	if err := runSonar(config, downloadClient, &runner, apiClient, &fileUtils, influx); err != nil {
@@ -221,6 +219,7 @@ func runSonar(config sonarExecuteScanOptions, client piperhttp.Downloader, runne
 		return nil
 	}
 
+        var serverUrl string
 	if len(config.ServerURL) > 0 {
 	serverUrl = config.ServerURL
 	} else {
