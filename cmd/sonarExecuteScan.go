@@ -115,6 +115,8 @@ func sonarExecuteScan(config sonarExecuteScanOptions, _ *telemetry.CustomData, i
 		options:     []string{},
 	}
 
+	 serverUrl := ""
+
 	influx.step_data.fields.sonar = false
 	fileUtils := piperutils.Files{}
 	if err := runSonar(config, downloadClient, &runner, apiClient, &fileUtils, influx); err != nil {
@@ -130,8 +132,6 @@ func sonarExecuteScan(config sonarExecuteScanOptions, _ *telemetry.CustomData, i
 func runSonar(config sonarExecuteScanOptions, client piperhttp.Downloader, runner command.ExecRunner, apiClient SonarUtils.Sender, utils piperutils.FileUtils, influx *sonarExecuteScanInflux) error {
 	// Set config based on orchestrator-specific environment variables
 	detectParametersFromCI(&config)
-
-	var serverUrl String
 
 	if len(config.ServerURL) > 0 {
 		sonar.addEnvironment("SONAR_HOST_URL=" + config.ServerURL)
