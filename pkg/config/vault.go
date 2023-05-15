@@ -173,26 +173,38 @@ func resolveVaultReference(ref *ResourceReference, config *StepConfig, client va
 }
 
 func resolveVaultTestCredentialsWrapper(config *StepConfig, client vaultClient) {
-	switch config.Config[vaultTestCredentialPath].(type) {
-	case string:
-		resolveVaultTestCredentials(config, client)
-	case []interface{}:
-		vaultTestCredentialPathCopy := config.Config[vaultTestCredentialPath]
-		vaultTestCredentialKeysCopy := config.Config[vaultTestCredentialKeys]
+	resolveVaultTestCredentialsWrapperBase(config, client, vaultTestCredentialPath, vaultTestCredentialKeys, resolveVaultTestCredentials)
+}
 
-		if _, ok := vaultTestCredentialKeysCopy.([][]interface{}); !ok || len(vaultTestCredentialKeysCopy.([][]interface{})) != len(vaultTestCredentialPathCopy.([]interface{})) {
+func resolveVaultCredentialsWrapper(config *StepConfig, client vaultClient) {
+	resolveVaultTestCredentialsWrapperBase(config, client, vaultCredentialPath, vaultCredentialKeys, resolveVaultCredentials)
+}
+
+func resolveVaultTestCredentialsWrapperBase(
+	config *StepConfig, client vaultClient,
+	vaultCredPath, vaultCredKeys string,
+	resolveVaultCredentials func(config *StepConfig, client vaultClient),
+) {
+	switch config.Config[vaultCredPath].(type) {
+	case string:
+		resolveVaultCredentials(config, client)
+	case []interface{}:
+		vaultCredentialPathCopy := config.Config[vaultCredPath]
+		vaultCredentialKeysCopy := config.Config[vaultCredKeys]
+
+		if _, ok := vaultCredentialKeysCopy.([][]interface{}); !ok || len(vaultCredentialKeysCopy.([][]interface{})) != len(vaultCredentialPathCopy.([]interface{})) {
 			log.Entry().Debugf("Not fetching credentials from vault since they are not (properly) configured")
 			return
 		}
 
-		for i := 0; i < len(vaultTestCredentialPathCopy.([]interface{})); i++ {
-			config.Config[vaultTestCredentialPath] = vaultTestCredentialPathCopy.([]interface{})[i]
-			config.Config[vaultTestCredentialKeys] = vaultTestCredentialKeysCopy.([][]interface{})[i]
-			resolveVaultTestCredentials(config, client)
+		for i := 0; i < len(vaultCredentialPathCopy.([]interface{})); i++ {
+			config.Config[vaultCredPath] = vaultCredentialPathCopy.([]interface{})[i]
+			config.Config[vaultCredKeys] = vaultCredentialKeysCopy.([][]interface{})[i]
+			resolveVaultCredentials(config, client)
 		}
 
-		config.Config[vaultTestCredentialPath] = vaultTestCredentialPathCopy
-		config.Config[vaultTestCredentialKeys] = vaultTestCredentialKeysCopy
+		config.Config[vaultCredPath] = vaultCredentialPathCopy
+		config.Config[vaultCredKeys] = vaultCredentialKeysCopy
 	default:
 		log.Entry().Debugf("Not fetching credentials from vault since they are not (properly) configured")
 		return
@@ -234,33 +246,6 @@ func resolveVaultTestCredentials(config *StepConfig, client vaultClient) {
 			// only allows vault test credentials on one / the same vault path
 			break
 		}
-	}
-}
-
-func resolveVaultCredentialsWrapper(config *StepConfig, client vaultClient) {
-	switch config.Config[vaultCredentialPath].(type) {
-	case string:
-		resolveVaultCredentials(config, client)
-	case []interface{}:
-		vaultCredentialPathCopy := config.Config[vaultCredentialPath]
-		vaultCredentialKeysCopy := config.Config[vaultCredentialKeys]
-
-		if _, ok := vaultCredentialKeysCopy.([]interface{}); !ok || len(vaultCredentialKeysCopy.([]interface{})) != len(vaultCredentialPathCopy.([]interface{})) {
-			log.Entry().Debugf("Not fetching credentials from vault since they are not (properly) configured")
-			return
-		}
-
-		for i := 0; i < len(vaultCredentialPathCopy.([]interface{})); i++ {
-			config.Config[vaultCredentialPath] = vaultCredentialPathCopy.([]interface{})[i]
-			config.Config[vaultCredentialKeys] = vaultCredentialKeysCopy.([]interface{})[i]
-			resolveVaultCredentials(config, client)
-		}
-
-		config.Config[vaultCredentialPath] = vaultCredentialPathCopy
-		config.Config[vaultCredentialKeys] = vaultCredentialKeysCopy
-	default:
-		log.Entry().Debugf("Not fetching credentials from vault since they are not (properly) configured")
-		return
 	}
 }
 
