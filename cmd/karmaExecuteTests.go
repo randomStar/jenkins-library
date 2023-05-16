@@ -22,9 +22,9 @@ func runKarma(config karmaExecuteTestsOptions, command command.ExecRunner) {
 	runCommandTokens := tokenize(config.RunCommand)
 	modulePaths := config.Modules
 
-	if GeneralConfig.Verbose {
-		runCommandTokens = append(runCommandTokens, "--", "--log-level", "DEBUG")
-	}
+	// if GeneralConfig.Verbose {
+	// 	runCommandTokens = append(runCommandTokens, "--", "--log-level", "DEBUG")
+	// }
 
 	for _, module := range modulePaths {
 		command.SetDir(module)
