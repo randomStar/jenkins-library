@@ -13,7 +13,7 @@ Init:
 Build:
   unstash:
     - source
-  stashes: [
+  stashes:
     - name: 'buildResult'
       includes: '**/target/*.war, **/target/*.jar, **/*.mtar, **/*.jar.original, dist/*'
       excludes: ''
@@ -29,7 +29,6 @@ Build:
     - name: 'sonar'
       includes: '**/jacoco*.exec, **/sonar-project.properties'
       excludes: ''
-  ]
 
 Integration:
   unstash:
