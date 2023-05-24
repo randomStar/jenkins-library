@@ -135,7 +135,6 @@ func mtaBuild(config mtaBuildOptions,
 	telemetryData *telemetry.CustomData,
 	commonPipelineEnvironment *mtaBuildCommonPipelineEnvironment) {
 	log.Entry().Debugf("Launching mta build")
-	config.Publish = false
 	utils := newMtaBuildUtilsBundle()
 
 	err := runMtaBuild(config, commonPipelineEnvironment, utils)
