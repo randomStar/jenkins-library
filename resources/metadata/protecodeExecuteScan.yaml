@@ -74,7 +74,7 @@ spec:
           - PARAMETERS
           - STAGES
           - STEPS
-        secret: true
+        secret: false
         resourceRef:
           - name: commonPipelineEnvironment
             param: custom/dockerConfigJSON
