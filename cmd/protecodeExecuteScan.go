@@ -383,7 +383,7 @@ func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) {
 		log.Entry().Fatal("failed to read fileeee")
 	}
 
-	log.Entry().Debugf("dockerConfig content is:: %v\n", string(b))
+	fmt.Printf("dockerConfig content is:: %v\n", string(b))
 
 	if len(path) > 0 {
 		log.Entry().Infof("Docker credentials configuration: %v", path)
