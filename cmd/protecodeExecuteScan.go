@@ -374,11 +374,16 @@ func uploadFile(utils protecodeUtils, config protecodeExecuteScanOptions, produc
 
 func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) {
 	path := config.DockerConfigJSON
+
+	log.Entry().Debugf("config.DockerConfigJSON::%v\n", config.DockerConfigJSON)
+	log.Entry().Debugf("path::%v\n", path)
+
 	if len(path) > 0 {
 		log.Entry().Infof("Docker credentials configuration: %v", path)
 		path, _ := filepath.Abs(path)
 		// use parent directory
 		path = filepath.Dir(path)
+		log.Entry().Debugf("path::%v\n", path)
 		os.Setenv("DOCKER_CONFIG", path)
 	} else {
 		log.Entry().Info("Docker credentials configuration: NONE")
