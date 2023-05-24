@@ -378,10 +378,10 @@ func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) {
 	log.Entry().Debugf("config.DockerConfigJSON::%v\n", config.DockerConfigJSON)
 	log.Entry().Debugf("path::%v\n", path)
 
-	b, err := os.ReadFile(config.DockerConfigJSON)
-	if err != nil {
-		log.Entry().Fatal("failed to read fileeee")
-	}
+	b, _ := os.ReadFile(config.DockerConfigJSON)
+	// if err != nil {
+	// 	log.Entry().Fatal("failed to read fileeee")
+	// }
 
 	fmt.Printf("dockerConfig content is:: %v\n", string(b))
 
