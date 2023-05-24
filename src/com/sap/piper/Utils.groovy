@@ -20,7 +20,7 @@ def stash(name, include = '**/*.*', exclude = '', useDefaultExcludes = true) {
     if (!useDefaultExcludes) {
         stashParams.useDefaultExcludes = useDefaultExcludes
     }
-    steps.stash stashParams
+    stash stashParams
 }
 
 def stashList(script, List stashes) {
@@ -35,11 +35,11 @@ def stashList(script, List stashes) {
             lock(lockName) {
                 unstash stash.name
                 echo "Stash content: ${name} (include: ${include}, exclude: ${exclude})"
-                steps.stash name: name, includes: include, excludes: exclude, allowEmpty: true
+                stash name: name, includes: include, excludes: exclude, allowEmpty: true
             }
         } else {
             echo "Stash content: ${name} (include: ${include}, exclude: ${exclude})"
-            steps.stash name: name, includes: include, excludes: exclude, allowEmpty: true
+            stash name: name, includes: include, excludes: exclude, allowEmpty: true
         }
     }
 }
@@ -82,7 +82,7 @@ def unstash(name, msg = "Unstash failed:") {
     def unstashedContent = []
     try {
         echo "Unstash content: ${name}"
-        steps.unstash name
+        unstash name
         unstashedContent += name
     } catch (e) {
         echo "$msg $name (${e.getMessage()})"
@@ -90,7 +90,7 @@ def unstash(name, msg = "Unstash failed:") {
             sleep(3) // Wait 3 seconds in case it has been a network hiccup
             try {
                 echo "[Retry JNLP4-connect issue] Unstashing content: ${name}"
-                steps.unstash name
+                unstash name
                 unstashedContent += name
             } catch (errRetry) {
                 msg = "[Retry JNLP4-connect issue] Unstashing failed:"
