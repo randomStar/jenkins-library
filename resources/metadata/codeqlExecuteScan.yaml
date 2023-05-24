@@ -142,37 +142,18 @@ spec:
           - name: commonPipelineEnvironment
             param: git/remoteCommitId
         type: string
-      - name: ram
-        type: string
-        description: "Testing purpose: Flag --ram for codeql commands"
+      - name: vulnerabilityThresholdTotal
+        description: "Threashold for maximum number of allowed vulnerabilities."
+        type: int
+        default: 0
         scope:
           - PARAMETERS
           - STAGES
           - STEPS
-      - name: threads
-        type: string
-        description: "Testing purpose: Flag --threads for codeql commands"
-        scope:
-          - PARAMETERS
-          - STAGES
-          - STEPS
-      - name: javaOptionsXmx
-        type: string
-        description: "Testing purpose: Flag -J=-Xmx for codeql commands"
-        scope:
-          - PARAMETERS
-          - STAGES
-          - STEPS
-      - name: javaOptionsXms
-        type: string
-        description: "Testing purpose: Flag -J=-Xms for codeql commands"
-        scope:
-          - PARAMETERS
-          - STAGES
-          - STEPS
-      - name: prestepcommand
-        type: string
-        description: "Testing purpose: Command to test before the codeql step"
+      - name: checkForCompliance
+        description: "If set to true, the piper step checks for compliance based on vulnerability threadholds. Example - If total vulnerabilites are 10 and vulnerabilityThresholdTotal is set as 0, then the steps throws an compliance error."
+        type: bool
+        default: false
         scope:
           - PARAMETERS
           - STAGES
