@@ -26,9 +26,10 @@ import (
 )
 
 const (
-	webReportPath  = "%s/#/product/%v/"
-	scanResultFile = "protecodescan_vulns.json"
-	stepResultFile = "protecodeExecuteScan.json"
+	webReportPath    = "%s/#/product/%v/"
+	scanResultFile   = "protecodescan_vulns.json"
+	stepResultFile   = "protecodeExecuteScan.json"
+	dockerConfigFile = ".pipeline/docker/config.json"
 )
 
 type protecodeUtils interface {
@@ -73,7 +74,7 @@ func runProtecodeScan(config *protecodeExecuteScanOptions, influx *protecodeExec
 		return err
 	}
 
-	if err := correctDockerConfigEnvVar(config); err != nil {
+	if err := correctDockerConfigEnvVar(config, utils); err != nil {
 		return err
 	}
 
@@ -375,9 +376,9 @@ func uploadFile(utils protecodeUtils, config protecodeExecuteScanOptions, produc
 	return productID
 }
 
-func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) error {
+func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions, utils protecodeUtils) error {
 	var err error
-	fileUtils := &piperutils.Files{}
+	// fileUtils := &piperutils.Files{}
 	path := config.DockerConfigJSON
 
 	log.Entry().Debugf("config.DockerConfigJSON::%v\n", config.DockerConfigJSON)
@@ -390,7 +391,7 @@ func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) error {
 
 	fmt.Printf("dockerConfig content is:: %v\n", string(b))
 	if len(config.DockerConfigJSON) > 0 && len(config.DockerRegistryURL) > 0 && len(config.ContainerRegistryPassword) > 0 && len(config.ContainerRegistryUser) > 0 {
-		path, err = docker.CreateDockerConfigJSON(config.DockerRegistryURL, config.ContainerRegistryUser, config.ContainerRegistryPassword, ".pipeline/docker/config.json", config.DockerConfigJSON, fileUtils)
+		path, err = docker.CreateDockerConfigJSON(config.DockerRegistryURL, config.ContainerRegistryUser, config.ContainerRegistryPassword, dockerConfigFile, config.DockerConfigJSON, utils)
 	}
 
 	if err != nil {
