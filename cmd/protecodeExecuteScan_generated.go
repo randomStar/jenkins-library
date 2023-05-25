@@ -175,12 +175,9 @@ BDBA (Protecode) uses a combination of static binary analysis techniques to X-ra
 				log.SetErrorCategory(log.ErrorConfiguration)
 				return err
 			}
-<<<<<<< HEAD
-=======
 			log.RegisterSecret(stepConfig.ContainerRegistryPassword)
 			log.RegisterSecret(stepConfig.ContainerRegistryUser)
 			log.RegisterSecret(stepConfig.DockerConfigJSON)
->>>>>>> anil/protecodeDockerConfigFix
 			log.RegisterSecret(stepConfig.Username)
 			log.RegisterSecret(stepConfig.Password)
 			log.RegisterSecret(stepConfig.UserAPIKey)
