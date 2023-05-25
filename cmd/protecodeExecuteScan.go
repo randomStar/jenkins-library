@@ -15,6 +15,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/SAP/jenkins-library/pkg/command"
+	"github.com/SAP/jenkins-library/pkg/docker"
 	piperDocker "github.com/SAP/jenkins-library/pkg/docker"
 	"github.com/SAP/jenkins-library/pkg/log"
 	"github.com/SAP/jenkins-library/pkg/piperutils"
@@ -72,7 +73,9 @@ func runProtecodeScan(config *protecodeExecuteScanOptions, influx *protecodeExec
 		return err
 	}
 
-	correctDockerConfigEnvVar(config)
+	if err := correctDockerConfigEnvVar(config); err != nil {
+		return err
+	}
 
 	var fileName, filePath string
 	var err error
@@ -372,7 +375,9 @@ func uploadFile(utils protecodeUtils, config protecodeExecuteScanOptions, produc
 	return productID
 }
 
-func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) {
+func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) error {
+	var err error
+	fileUtils := &piperutils.Files{}
 	path := config.DockerConfigJSON
 
 	log.Entry().Debugf("config.DockerConfigJSON::%v\n", config.DockerConfigJSON)
@@ -384,6 +389,13 @@ func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) {
 	// }
 
 	fmt.Printf("dockerConfig content is:: %v\n", string(b))
+	if len(config.DockerConfigJSON) > 0 && len(config.DockerRegistryURL) > 0 && len(config.ContainerRegistryPassword) > 0 && len(config.ContainerRegistryUser) > 0 {
+		path, err = docker.CreateDockerConfigJSON(config.DockerRegistryURL, config.ContainerRegistryUser, config.ContainerRegistryPassword, "", config.DockerConfigJSON, fileUtils)
+	}
+
+	if err != nil {
+		return errors.Wrapf(err, "failed to create / update docker config json file")
+	}
 
 	if len(path) > 0 {
 		log.Entry().Infof("Docker credentials configuration: %v", path)
@@ -395,6 +407,7 @@ func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) {
 	} else {
 		log.Entry().Info("Docker credentials configuration: NONE")
 	}
+	return nil
 }
 
 // Calculate version based on versioning model and artifact version or return custom scan version provided by user
