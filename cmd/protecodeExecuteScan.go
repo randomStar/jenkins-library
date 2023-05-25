@@ -390,7 +390,7 @@ func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) error {
 
 	fmt.Printf("dockerConfig content is:: %v\n", string(b))
 	if len(config.DockerConfigJSON) > 0 && len(config.DockerRegistryURL) > 0 && len(config.ContainerRegistryPassword) > 0 && len(config.ContainerRegistryUser) > 0 {
-		path, err = docker.CreateDockerConfigJSON(config.DockerRegistryURL, config.ContainerRegistryUser, config.ContainerRegistryPassword, "", config.DockerConfigJSON, fileUtils)
+		path, err = docker.CreateDockerConfigJSON(config.DockerRegistryURL, config.ContainerRegistryUser, config.ContainerRegistryPassword, ".pipeline/docker/config.json", config.DockerConfigJSON, fileUtils)
 	}
 
 	if err != nil {
@@ -400,7 +400,7 @@ func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) error {
 	log.Entry().Debugf("config.DockerConfigJSON::%v\n", config.DockerConfigJSON)
 	log.Entry().Debugf("path::%v\n", path)
 
-	b, _ = os.ReadFile(config.DockerConfigJSON)
+	b, _ = os.ReadFile(path)
 	fmt.Printf("dockerConfig content is:: %v\n", string(b))
 
 	if len(path) > 0 {
