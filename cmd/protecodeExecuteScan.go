@@ -397,6 +397,12 @@ func correctDockerConfigEnvVar(config *protecodeExecuteScanOptions) error {
 		return errors.Wrapf(err, "failed to create / update docker config json file")
 	}
 
+	log.Entry().Debugf("config.DockerConfigJSON::%v\n", config.DockerConfigJSON)
+	log.Entry().Debugf("path::%v\n", path)
+
+	b, _ = os.ReadFile(config.DockerConfigJSON)
+	fmt.Printf("dockerConfig content is:: %v\n", string(b))
+
 	if len(path) > 0 {
 		log.Entry().Infof("Docker credentials configuration: %v", path)
 		path, _ := filepath.Abs(path)
