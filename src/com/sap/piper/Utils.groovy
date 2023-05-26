@@ -44,9 +44,14 @@ def stashList(script, List stashes) {
     }
 }
 
+def stash(Map parameters) {
+    System.err.println("[MH] entering stash: ${parameters}")
+}
+
 def stashWithMessage(name, msg, include = '**/*.*', exclude = '', useDefaultExcludes = true) {
     try {
-        stash(name, include, exclude, useDefaultExcludes)
+        System.err.println("[MH] invoke stash with named paramters")
+        stash(name: name, includes: include, excludes: exclude, useDefaultExcludes: useDefaultExcludes)
     } catch (e) {
         echo msg + name + " (${e.getMessage()})"
     }

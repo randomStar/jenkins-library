@@ -110,6 +110,17 @@ class UtilsTest extends BasePiperTest {
         ] as Set
     }
 
+
+    @Test
+    void testFoo() {
+        new Utils().stash(name: 'foo', includes: '**/*.foo', excludes: '**/*.bar', useDefaultExcludes: true)
+    }
+
+    @Test
+    void testFoo2() {
+        new Utils().stashWithMessage('foo', 'this is the message')
+    }
+
     @Test
     void testStashListDoesNotSwallowException() {
 
