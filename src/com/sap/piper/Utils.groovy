@@ -45,7 +45,11 @@ def stashList(script, List stashes) {
 }
 
 def stash(Map parameters) {
-    System.err.println("[MH] entering stash: ${parameters}")
+    System.err.println("[MH] entering stash(Map): ${parameters}")
+}
+
+def stash(String name) {
+    System.err.println("[MH] entering stash(String): ${parameters}")
 }
 
 def stashWithMessage(name, msg, include = '**/*.*', exclude = '', useDefaultExcludes = true) {
