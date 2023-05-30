@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"reflect"
 	"regexp"
 	"strings"
 
@@ -174,15 +175,15 @@ func resolveVaultReference(ref *ResourceReference, config *StepConfig, client va
 
 func resolveVaultTestCredentialsWrapper(config *StepConfig, client vaultClient) {
 	log.Entry().Debugln("resolveVaultTestCredentialsWrapper")
-	resolveVaultTestCredentialsWrapperBase(config, client, vaultTestCredentialPath, vaultTestCredentialKeys, resolveVaultTestCredentials)
+	resolveVaultCredentialsWrapperBase(config, client, vaultTestCredentialPath, vaultTestCredentialKeys, resolveVaultTestCredentials)
 }
 
 func resolveVaultCredentialsWrapper(config *StepConfig, client vaultClient) {
 	log.Entry().Debugln("resolveVaultCredentialsWrapper")
-	resolveVaultTestCredentialsWrapperBase(config, client, vaultCredentialPath, vaultCredentialKeys, resolveVaultCredentials)
+	resolveVaultCredentialsWrapperBase(config, client, vaultCredentialPath, vaultCredentialKeys, resolveVaultCredentials)
 }
 
-func resolveVaultTestCredentialsWrapperBase(
+func resolveVaultCredentialsWrapperBase(
 	config *StepConfig, client vaultClient,
 	vaultCredPath, vaultCredKeys string,
 	resolveVaultCredentials func(config *StepConfig, client vaultClient),
@@ -191,6 +192,7 @@ func resolveVaultTestCredentialsWrapperBase(
 	case string:
 		resolveVaultCredentials(config, client)
 	case []interface{}:
+		log.Entry().Debugln("[]interface{}")
 		vaultCredentialPathCopy := config.Config[vaultCredPath]
 		vaultCredentialKeysCopy := config.Config[vaultCredKeys]
 
@@ -204,16 +206,23 @@ func resolveVaultTestCredentialsWrapperBase(
 			return
 		}
 
+		log.Entry().Debugln("Checks ok")
+
 		for i := 0; i < len(vaultCredentialPathCopy.([]interface{})); i++ {
 			config.Config[vaultCredPath] = vaultCredentialPathCopy.([]interface{})[i]
 			config.Config[vaultCredKeys] = vaultCredentialKeysCopy.([]interface{})[i]
 			resolveVaultCredentials(config, client)
 		}
 
+		log.Entry().Debugln("resolved")
+
 		config.Config[vaultCredPath] = vaultCredentialPathCopy
 		config.Config[vaultCredKeys] = vaultCredentialKeysCopy
 	default:
 		log.Entry().Debugf("Not fetching credentials from vault since they are not (properly) configured: unknown type of path")
+		log.Entry().Debugln("----->", reflect.TypeOf(config.Config[vaultCredPath]))
+		log.Entry().Debugln("----->", config.Config[vaultCredPath])
+		log.Entry().Debugln("----->", vaultCredPath)
 		return
 	}
 }
@@ -224,6 +233,8 @@ func resolveVaultTestCredentials(config *StepConfig, client vaultClient) {
 	keys := getTestCredentialKeys(config)
 	if !(pathOk && keys != nil) || credPath == "" || len(keys) == 0 {
 		log.Entry().Debugf("Not fetching test credentials from Vault since they are not (properly) configured")
+		log.Entry().Debugln("typeof:", reflect.TypeOf(config.Config[vaultTestCredentialPath]))
+		log.Entry().Debugln(config.Config[vaultTestCredentialPath])
 		return
 	}
 
@@ -261,6 +272,8 @@ func resolveVaultCredentials(config *StepConfig, client vaultClient) {
 	keys := getCredentialKeys(config)
 	if !(pathOk && keys != nil) || credPath == "" || len(keys) == 0 {
 		log.Entry().Debugf("Not fetching credentials from vault since they are not (properly) configured")
+		log.Entry().Debugf("typeof:", reflect.TypeOf(config.Config[vaultCredentialPath]))
+		log.Entry().Debugln(config.Config[vaultCredentialPath])
 		return
 	}
 
@@ -269,11 +282,14 @@ func resolveVaultCredentials(config *StepConfig, client vaultClient) {
 	lookupPath[1] = "$(vaultBasePath)/$(vaultPipelineName)/" + credPath
 	lookupPath[2] = "$(vaultBasePath)/GROUP-SECRETS/" + credPath
 
+	log.Entry().Debugln("Going to resolve")
 	for _, path := range lookupPath {
+		log.Entry().Debugln("Trying to interpolate")
 		vaultPath, ok := interpolation.ResolveString(path, config.Config)
 		if !ok {
 			continue
 		}
+		log.Entry().Debugln("Interpolated")
 
 		secret, err := client.GetKvSecret(vaultPath)
 		if err != nil {
