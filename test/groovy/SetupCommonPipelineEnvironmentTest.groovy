@@ -203,8 +203,15 @@ class SetupCommonPipelineEnvironmentTest extends BasePiperTest {
             throw new IllegalArgumentException("Unexpected invocation of readYaml step")
         })
 
+        def utilsMock = new Utils()
+        utilsMock.steps = [
+            stash  : {  },
+            unstash: {  }
+        ]
+
         stepRule.step.setupCommonPipelineEnvironment(
             script: nullScript,
+            utils: utilsMock,
             configFile: '.pipeline/config-with-custom-defaults.yml'
         )
 
