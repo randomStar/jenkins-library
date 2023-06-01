@@ -125,6 +125,14 @@ func golangBuild(config golangBuildOptions, telemetryData *telemetry.CustomData,
 }
 
 func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomData, utils golangBuildUtils, commonPipelineEnvironment *golangBuildCommonPipelineEnvironment) error {
+
+	// ***
+	k1, ok := os.LookupEnv("PIPER_VAULTCREDENTIAL_KEY1")
+	fmt.Printf("k1: %v, ok: %v\n", k1, ok)
+
+	k2, ok := os.LookupEnv("PIPER_VAULTCREDENTIAL_KEY2")
+	fmt.Printf("k2: %v, ok: %v\n", k2, ok)
+
 	goModFile, err := readGoModFile(utils) // returns nil if go.mod doesnt exist
 	if err != nil {
 		return err
