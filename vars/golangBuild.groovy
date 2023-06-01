@@ -7,5 +7,8 @@ void call(Map parameters = [:]) {
     List credentials = [
         [type: 'usernamePassword', id: 'golangPrivateModulesGitTokenCredentialsId', env: ['PIPER_privateModulesGitUsername', 'PIPER_privateModulesGitToken']]
     ]
+    parameters['securityContext'] = [
+        'runAsUser': 0
+    ]
     piperExecuteBin(parameters, STEP_NAME, METADATA_FILE, credentials)
 }

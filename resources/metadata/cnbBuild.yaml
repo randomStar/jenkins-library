@@ -338,3 +338,8 @@ spec:
             type: sbom
   containers:
     - image: "paketobuildpacks/builder:base"
+      securityContext:
+        runAsUser: 0
+      options:
+        - name: -u
+          value: "0"
