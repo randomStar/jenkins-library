@@ -452,6 +452,7 @@ private Map getAdditionalPodProperties(Map config) {
 }
 
 private Map getSecurityContext(Map config) {
+    echo "Possible ${config.securityContext}"
     return config.securityContext ?: config.jenkinsKubernetes.securityContext ?: [:]
 }
 
