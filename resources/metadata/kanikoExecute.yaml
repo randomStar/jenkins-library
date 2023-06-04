@@ -148,6 +148,31 @@ spec:
           - PARAMETERS
           - STAGES
           - STEPS
+
+      - name: containerMultiImageBuildV2
+        type: bool
+        description: ""
+        scope:
+          - GENERAL
+          - PARAMETERS
+          - STAGES
+          - STEPS
+      - name: buildContexts
+        type: '[]string'
+        scope:
+          - STEPS
+          - PARAMETERS
+      - name: containerImageNames
+        type: '[]string'
+        scope:
+          - STEPS
+          - PARAMETERS
+      - name: dockerFile
+        type: string
+        scope:
+          - STEPS
+          - PARAMETERS
+
       - name: containerMultiImageBuildExcludes
         type: '[]string'
         description: Defines a list of Dockerfile paths to exclude from the build when using [`containerMultiImageBuild`](#containermultiimagebuild).

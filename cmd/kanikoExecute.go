@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"github.com/SAP/jenkins-library/pkg/buildsettings"
@@ -147,6 +148,22 @@ func runKanikoExecute(config *kanikoExecuteOptions, telemetryData *telemetry.Cus
 			// Docker image tags don't allow plus signs in tags, thus replacing with dash
 			containerImageTag := strings.ReplaceAll(config.ContainerImageTag, "+", "-")
 
+			if config.ContainerMultiImageBuildV2 {
+				// debug
+				log.Entry().Debugln("ContainerMultiImageBuildV2 is true")
+
+				for index, containerImageName := range config.ContainerImageNames {
+					log.Entry().Debugf("Building image '%v' using file '%v'", containerImageName, config.DockerFile)
+					containerImageNameAndTag := fmt.Sprintf("%v:%v", containerImageName, containerImageTag)
+					dest = []string{"--destination", fmt.Sprintf("%v/%v", containerRegistry, containerImageNameAndTag)}
+					buildOpts := append(config.BuildOptions, dest...)
+					err = runKaniko(config.BuildContexts[index], config.DockerFile, buildOpts, config.ReadImageDigest, execRunner, fileUtils, commonPipelineEnvironment)
+					if err != nil {
+						return fmt.Errorf("failed to build image '%v' using '%v': %w", containerImageName, config.DockerFile, err)
+					}
+				}
+			}
+
 			if config.ContainerMultiImageBuild {
 				log.Entry().Debugf("Multi-image build activated for image name '%v'", config.ContainerImageName)
 				imageListWithFilePath, err := docker.ImageListWithFilePath(config.ContainerImageName, config.ContainerMultiImageBuildExcludes, config.ContainerMultiImageBuildTrimDir, fileUtils)
@@ -161,7 +178,7 @@ func runKanikoExecute(config *kanikoExecuteOptions, telemetryData *telemetry.Cus
 					containerImageNameAndTag := fmt.Sprintf("%v:%v", image, containerImageTag)
 					dest = []string{"--destination", fmt.Sprintf("%v/%v", containerRegistry, containerImageNameAndTag)}
 					buildOpts := append(config.BuildOptions, dest...)
-					err = runKaniko(file, buildOpts, config.ReadImageDigest, execRunner, fileUtils, commonPipelineEnvironment)
+					err = runKaniko("", file, buildOpts, config.ReadImageDigest, execRunner, fileUtils, commonPipelineEnvironment)
 					if err != nil {
 						return fmt.Errorf("failed to build image '%v' using '%v': %w", image, file, err)
 					}
@@ -236,7 +253,7 @@ func runKanikoExecute(config *kanikoExecuteOptions, telemetryData *telemetry.Cus
 	}
 
 	// no support for building multiple containers
-	kanikoErr := runKaniko(config.DockerfilePath, config.BuildOptions, config.ReadImageDigest, execRunner, fileUtils, commonPipelineEnvironment)
+	kanikoErr := runKaniko("", config.DockerfilePath, config.BuildOptions, config.ReadImageDigest, execRunner, fileUtils, commonPipelineEnvironment)
 	if kanikoErr != nil {
 		return kanikoErr
 	}
@@ -247,13 +264,13 @@ func runKanikoExecute(config *kanikoExecuteOptions, telemetryData *telemetry.Cus
 	return nil
 }
 
-func runKaniko(dockerFilepath string, buildOptions []string, readDigest bool, execRunner command.ExecRunner, fileUtils piperutils.FileUtils, commonPipelineEnvironment *kanikoExecuteCommonPipelineEnvironment) error {
+func runKaniko(buildContex string, dockerFilepath string, buildOptions []string, readDigest bool, execRunner command.ExecRunner, fileUtils piperutils.FileUtils, commonPipelineEnvironment *kanikoExecuteCommonPipelineEnvironment) error {
 	cwd, err := fileUtils.Getwd()
 	if err != nil {
 		return fmt.Errorf("failed to get current working directory: %w", err)
 	}
 
-	kanikoOpts := []string{"--dockerfile", dockerFilepath, "--context", cwd}
+	kanikoOpts := []string{"--dockerfile", dockerFilepath, "--context", filepath.Join(cwd, buildContex)}
 	kanikoOpts = append(kanikoOpts, buildOptions...)
 
 	tmpDir, err := fileUtils.TempDir("", "*-kanikoExecute")

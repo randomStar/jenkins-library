@@ -29,6 +29,10 @@ type kanikoExecuteOptions struct {
 	ContainerImageName               string   `json:"containerImageName,omitempty" validate:"required_if=ContainerMultiImageBuild true"`
 	ContainerImageTag                string   `json:"containerImageTag,omitempty"`
 	ContainerMultiImageBuild         bool     `json:"containerMultiImageBuild,omitempty"`
+	ContainerMultiImageBuildV2       bool     `json:"containerMultiImageBuildV2,omitempty"`
+	BuildContexts                    []string `json:"buildContexts,omitempty"`
+	ContainerImageNames              []string `json:"containerImageNames,omitempty"`
+	DockerFile                       string   `json:"dockerFile,omitempty"`
 	ContainerMultiImageBuildExcludes []string `json:"containerMultiImageBuildExcludes,omitempty"`
 	ContainerMultiImageBuildTrimDir  string   `json:"containerMultiImageBuildTrimDir,omitempty"`
 	ContainerPreparationCommand      string   `json:"containerPreparationCommand,omitempty"`
@@ -290,6 +294,10 @@ func addKanikoExecuteFlags(cmd *cobra.Command, stepConfig *kanikoExecuteOptions)
 	cmd.Flags().StringVar(&stepConfig.ContainerImageName, "containerImageName", os.Getenv("PIPER_containerImageName"), "Name of the container which will be built - will be used instead of parameter `containerImage`")
 	cmd.Flags().StringVar(&stepConfig.ContainerImageTag, "containerImageTag", os.Getenv("PIPER_containerImageTag"), "Tag of the container which will be built - will be used instead of parameter `containerImage`")
 	cmd.Flags().BoolVar(&stepConfig.ContainerMultiImageBuild, "containerMultiImageBuild", false, "Defines if multiple containers should be build. Dockerfiles are used using the pattern **/Dockerfile*. Excludes can be defined via [`containerMultiImageBuildExcludes`](#containermultiimagebuildexscludes).")
+	cmd.Flags().BoolVar(&stepConfig.ContainerMultiImageBuildV2, "containerMultiImageBuildV2", false, "")
+	cmd.Flags().StringSliceVar(&stepConfig.BuildContexts, "buildContexts", []string{}, "")
+	cmd.Flags().StringSliceVar(&stepConfig.ContainerImageNames, "containerImageNames", []string{}, "")
+	cmd.Flags().StringVar(&stepConfig.DockerFile, "dockerFile", os.Getenv("PIPER_dockerFile"), "")
 	cmd.Flags().StringSliceVar(&stepConfig.ContainerMultiImageBuildExcludes, "containerMultiImageBuildExcludes", []string{}, "Defines a list of Dockerfile paths to exclude from the build when using [`containerMultiImageBuild`](#containermultiimagebuild).")
 	cmd.Flags().StringVar(&stepConfig.ContainerMultiImageBuildTrimDir, "containerMultiImageBuildTrimDir", os.Getenv("PIPER_containerMultiImageBuildTrimDir"), "Defines a trailing directory part which should not be considered in the final image name.")
 	cmd.Flags().StringVar(&stepConfig.ContainerPreparationCommand, "containerPreparationCommand", `rm -f /kaniko/.docker/config.json`, "Defines the command to prepare the Kaniko container. By default the contained credentials are removed in order to allow anonymous access to container registries.")
@@ -392,6 +400,42 @@ func kanikoExecuteMetadata() config.StepData {
 						Mandatory:   false,
 						Aliases:     []config.Alias{},
 						Default:     false,
+					},
+					{
+						Name:        "containerMultiImageBuildV2",
+						ResourceRef: []config.ResourceReference{},
+						Scope:       []string{"GENERAL", "PARAMETERS", "STAGES", "STEPS"},
+						Type:        "bool",
+						Mandatory:   false,
+						Aliases:     []config.Alias{},
+						Default:     false,
+					},
+					{
+						Name:        "buildContexts",
+						ResourceRef: []config.ResourceReference{},
+						Scope:       []string{"STEPS", "PARAMETERS"},
+						Type:        "[]string",
+						Mandatory:   false,
+						Aliases:     []config.Alias{},
+						Default:     []string{},
+					},
+					{
+						Name:        "containerImageNames",
+						ResourceRef: []config.ResourceReference{},
+						Scope:       []string{"STEPS", "PARAMETERS"},
+						Type:        "[]string",
+						Mandatory:   false,
+						Aliases:     []config.Alias{},
+						Default:     []string{},
+					},
+					{
+						Name:        "dockerFile",
+						ResourceRef: []config.ResourceReference{},
+						Scope:       []string{"STEPS", "PARAMETERS"},
+						Type:        "string",
+						Mandatory:   false,
+						Aliases:     []config.Alias{},
+						Default:     os.Getenv("PIPER_dockerFile"),
 					},
 					{
 						Name:        "containerMultiImageBuildExcludes",

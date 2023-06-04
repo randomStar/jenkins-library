@@ -227,6 +227,9 @@ func ImageListWithFilePath(imageName string, excludes []string, trimDir string, 
 		return imageList, fmt.Errorf("failed to retrieve Dockerfiles")
 	}
 
+	// debug
+	log.Entry().Debugf("matches:: %v\n", matches)
+
 	for _, dockerfilePath := range matches {
 		// make sure that the path we have is relative
 		// ToDo: needs rework
@@ -243,6 +246,10 @@ func ImageListWithFilePath(imageName string, excludes []string, trimDir string, 
 			var finalName string
 			if base := filepath.Base(dockerfilePath); base == "Dockerfile" {
 				subName := strings.ReplaceAll(filepath.Dir(dockerfilePath), string(filepath.Separator), "-")
+
+				// debug
+				log.Entry().Debugf("subName:: %v\n", subName)
+
 				if len(trimDir) > 0 {
 					// allow to remove trailing sub directories
 					// example .ci/app/Dockerfile
@@ -252,15 +259,26 @@ func ImageListWithFilePath(imageName string, excludes []string, trimDir string, 
 					subName = strings.TrimPrefix(subName, "-")
 				}
 				finalName = fmt.Sprintf("%v-%v", imageName, subName)
+
+				// debug
+				log.Entry().Debugf("finalName:: %v\n", finalName)
+
 			} else {
 				parts := strings.FieldsFunc(base, func(separator rune) bool {
 					return separator == []rune("-")[0] || separator == []rune("_")[0]
 				})
+
+				// debug
+				log.Entry().Debugf("parts:: %v\n", parts)
+
 				if len(parts) == 1 {
 					return imageList, fmt.Errorf("wrong format of Dockerfile, must be inside a sub-folder or contain a separator")
 				}
 				parts[0] = imageName
 				finalName = strings.Join(parts, "-")
+
+				// debug
+				log.Entry().Debugf("finalName:: %v\n", finalName)
 			}
 
 			imageList[finalName] = dockerfilePath
