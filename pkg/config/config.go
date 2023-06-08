@@ -49,10 +49,17 @@ func (c *Config) ReadConfig(configuration io.ReadCloser) error {
 		return errors.Wrapf(err, "error reading %v", configuration)
 	}
 
+	// debug
+	log.Entry().Debugf("config content:: %v\n", string(content))
+
 	err = yaml.Unmarshal(content, &c)
 	if err != nil {
 		return NewParseError(fmt.Sprintf("format of configuration is invalid %q: %v", content, err))
 	}
+
+	// debug
+	log.Entry().Debugf("config:: %v\n", c)
+
 	return nil
 }
 
@@ -193,6 +200,10 @@ func (c *Config) GetStepConfig(flagValues map[string]interface{}, paramJSON stri
 
 	// read defaults & merge general -> steps (-> general -> steps ...)
 	for _, def := range c.defaults.Defaults {
+
+		// debug
+		log.Entry().Debugf("def.Hooks:: %v\n", def.Hooks)
+
 		def.ApplyAliasConfig(parameters, secrets, filters, stageName, stepName, stepAliases)
 		stepConfig.mixIn(def.General, filters.General)
 		stepConfig.mixIn(def.Steps[stepName], filters.Steps)
@@ -207,6 +218,10 @@ func (c *Config) GetStepConfig(flagValues map[string]interface{}, paramJSON stri
 
 		stepConfig.mixInHookConfig(def.Hooks)
 	}
+
+	// debug
+	log.Entry().Debugf("stepConfig.HookConfig:: %v\n", stepConfig.HookConfig)
+	log.Entry().Debugf("stepConfig.Config:: %v\n", stepConfig.Config)
 
 	// read config & merge - general -> steps -> stages
 	stepConfig.mixIn(c.General, filters.General)

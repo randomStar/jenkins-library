@@ -427,6 +427,11 @@ func PrepareConfig(cmd *cobra.Command, metadata *config.StepData, stepName strin
 	if GeneralConfig.GCSSubFolder == "" {
 		GeneralConfig.GCSSubFolder, _ = stepConfig.Config["gcsSubFolder"].(string)
 	}
+
+	// debug
+	log.Entry().Debugf("GeneralConfig:: %v\n", GeneralConfig)
+	log.Entry().Debugf("GeneralConfig.:: %v\n", GeneralConfig.HookConfig)
+
 	return nil
 }
 
