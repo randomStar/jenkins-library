@@ -133,7 +133,9 @@ func (c *Command) RunExecutable(executable string, params ...string) error {
 	log.Entry().Debugf("rawCmd:: %v\n", rawCmd)
 	finalParams := os.ExpandEnv(rawCmd)
 	log.Entry().Debugf("finalParams:: %+q\n", finalParams)
-	cmd := ExecCommand(executable, finalParams)
+	p := strings.Split(finalParams, " ")
+	log.Entry().Debugf("p:: %+q\n", p)
+	cmd := ExecCommand(executable, p...)
 
 	if len(c.dir) > 0 {
 		cmd.Dir = c.dir
