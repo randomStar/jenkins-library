@@ -129,7 +129,11 @@ func (c *Command) RunShell(shell, script string) error {
 func (c *Command) RunExecutable(executable string, params ...string) error {
 	c.prepareOut()
 
-	cmd := ExecCommand(executable, params...)
+	rawCmd := strings.Join(params, " ")
+	log.Entry().Debugf("rawCmd:: %v\n", rawCmd)
+	finalParams := os.ExpandEnv(rawCmd)
+	log.Entry().Debugf("finalParams:: %+q\n", finalParams)
+	cmd := ExecCommand(executable, finalParams)
 
 	if len(c.dir) > 0 {
 		cmd.Dir = c.dir
