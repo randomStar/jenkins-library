@@ -190,6 +190,8 @@ You can use the [sample projects](https://github.com/getgauge/gauge-mvn-archetyp
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
+
+					log.Entry().Debug("Data is sent to dev-instance")
 				}
 
 				if len(GeneralConfig.HookConfig.SplunkConfig.ProdDsn) > 0 {
@@ -201,6 +203,8 @@ You can use the [sample projects](https://github.com/getgauge/gauge-mvn-archetyp
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
+
+					log.Entry().Debug("Data is sent to prod-instance")
 				}
 			}
 			log.DeferExitHandler(handler)

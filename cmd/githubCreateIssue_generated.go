@@ -108,6 +108,8 @@ You will be able to use this step for example for regular jobs to report into yo
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
+
+					log.Entry().Debug("Data is sent to dev-instance")
 				}
 
 				if len(GeneralConfig.HookConfig.SplunkConfig.ProdDsn) > 0 {
@@ -119,6 +121,8 @@ You will be able to use this step for example for regular jobs to report into yo
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
+
+					log.Entry().Debug("Data is sent to prod-instance")
 				}
 			}
 			log.DeferExitHandler(handler)

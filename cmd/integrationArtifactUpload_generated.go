@@ -101,6 +101,8 @@ func IntegrationArtifactUploadCommand() *cobra.Command {
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
+
+					log.Entry().Debug("Data is sent to dev-instance")
 				}
 
 				if len(GeneralConfig.HookConfig.SplunkConfig.ProdDsn) > 0 {
@@ -112,6 +114,8 @@ func IntegrationArtifactUploadCommand() *cobra.Command {
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
+
+					log.Entry().Debug("Data is sent to prod-instance")
 				}
 			}
 			log.DeferExitHandler(handler)

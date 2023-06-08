@@ -292,6 +292,8 @@ The step uses the so-called Mend Unified Agent. For details please refer to the 
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
+
+					log.Entry().Debug("Data is sent to dev-instance")
 				}
 
 				if len(GeneralConfig.HookConfig.SplunkConfig.ProdDsn) > 0 {
@@ -303,6 +305,8 @@ The step uses the so-called Mend Unified Agent. For details please refer to the 
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
+
+					log.Entry().Debug("Data is sent to prod-instance")
 				}
 			}
 			log.DeferExitHandler(handler)

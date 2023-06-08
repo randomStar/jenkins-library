@@ -156,6 +156,8 @@ In the Docker network, the containers can be referenced by the values provided i
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
+
+					log.Entry().Debug("Data is sent to dev-instance")
 				}
 
 				if len(GeneralConfig.HookConfig.SplunkConfig.ProdDsn) > 0 {
@@ -167,6 +169,8 @@ In the Docker network, the containers can be referenced by the values provided i
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
+
+					log.Entry().Debug("Data is sent to prod-instance")
 				}
 			}
 			log.DeferExitHandler(handler)
