@@ -137,6 +137,8 @@ func (c *Command) RunExecutable(executable string, params ...string) error {
 	log.Entry().Debugf("p:: %+q\n", p)
 	cmd := ExecCommand(executable, p...)
 
+	log.Entry().Infof("running command: %v %v", executable, strings.Join(p, (" ")))
+
 	if len(c.dir) > 0 {
 		cmd.Dir = c.dir
 	}
