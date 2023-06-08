@@ -44,6 +44,8 @@ func (s *Splunk) Initialize(correlationID, dsn, token, index string, sendLogs bo
 		token = "Splunk " + token
 	}
 
+	// debug
+	log.Entry().Debug("before client creation")
 	log.RegisterSecret(token)
 	client := piperhttp.Client{}
 
@@ -53,6 +55,9 @@ func (s *Splunk) Initialize(correlationID, dsn, token, index string, sendLogs bo
 		TransportSkipVerification: true,
 		MaxRetries:                1,
 	})
+
+	// debug
+	log.Entry().Debug("after client creation")
 
 	hostName, err := os.Hostname()
 	if err != nil {
