@@ -19,7 +19,6 @@ type DeployUtils interface {
 	Stdout(out io.Writer)
 	Stderr(err io.Writer)
 	RunExecutable(e string, p ...string) error
-	RunShell(shell string, command string) error
 
 	piperutils.FileUtils
 	piperhttp.Uploader

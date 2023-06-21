@@ -211,8 +211,7 @@ func runHelmDeploy(config kubernetesDeployOptions, utils kubernetes.DeployUtils,
 	utils.Stdout(stdout)
 	log.Entry().Info("Calling helm upgrade ...")
 	log.Entry().Debugf("Helm parameters %v", upgradeParams)
-	// if err := utils.RunExecutable("helm", upgradeParams...); err != nil {
-	if err := utils.RunShell("helm", strings.Join(upgradeParams, " ")); err != nil {
+	if err := utils.RunExecutable("helm", upgradeParams...); err != nil {
 		log.Entry().WithError(err).Fatal("Helm upgrade call failed")
 	}
 
