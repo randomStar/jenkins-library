@@ -22,6 +22,7 @@ import (
 )
 
 type cnbBuildOptions struct {
+	ContainerUser             int                      `json:"containerUser,omitempty"`
 	ContainerImageName        string                   `json:"containerImageName,omitempty"`
 	ContainerImageAlias       string                   `json:"containerImageAlias,omitempty"`
 	ContainerImageTag         string                   `json:"containerImageTag,omitempty"`
@@ -222,6 +223,7 @@ func CnbBuildCommand() *cobra.Command {
 }
 
 func addCnbBuildFlags(cmd *cobra.Command, stepConfig *cnbBuildOptions) {
+	cmd.Flags().IntVar(&stepConfig.ContainerUser, "containerUser", 0, "UID running the container")
 	cmd.Flags().StringVar(&stepConfig.ContainerImageName, "containerImageName", os.Getenv("PIPER_containerImageName"), "Name of the container which will be built\n`cnbBuild` step will try to identify a containerImageName using the following precedence:\n\n  1. `containerImageName` parameter.\n  2. `project.id` field of a `project.toml` file.\n  3. `git/repository` parameter of the `commonPipelineEnvironment`.\n  4. `github/repository` parameter of the `commonPipelineEnvironment`.\n\nIf none of the above was found - an error will be raised.\n")
 	cmd.Flags().StringVar(&stepConfig.ContainerImageAlias, "containerImageAlias", os.Getenv("PIPER_containerImageAlias"), "Logical name used for this image.\n")
 	cmd.Flags().StringVar(&stepConfig.ContainerImageTag, "containerImageTag", os.Getenv("PIPER_containerImageTag"), "Tag of the container which will be built")
@@ -261,6 +263,15 @@ func cnbBuildMetadata() config.StepData {
 					{Name: "dockerConfigJsonCredentialsId", Description: "Jenkins 'Secret file' credentials ID containing Docker config.json (with registry credential(s)) in the following format:\n\n```json\n{\n  \"auths\": {\n    \"$server\": {\n      \"auth\": \"base64($username + ':' + $password)\"\n    }\n  }\n}\n```\n\nExample:\n\n```json\n{\n  \"auths\": {\n    \"example.com\": {\n      \"auth\": \"dXNlcm5hbWU6cGFzc3dvcmQ=\"\n    }\n  }\n}\n```\n", Type: "jenkins"},
 				},
 				Parameters: []config.StepParameters{
+					{
+						Name:        "containerUser",
+						ResourceRef: []config.ResourceReference{},
+						Scope:       []string{"GENERAL", "PARAMETERS", "STAGES", "STEPS"},
+						Type:        "int",
+						Mandatory:   false,
+						Aliases:     []config.Alias{},
+						Default:     0,
+					},
 					{
 						Name:        "containerImageName",
 						ResourceRef: []config.ResourceReference{},

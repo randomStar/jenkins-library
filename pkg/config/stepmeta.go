@@ -106,17 +106,22 @@ type StepOutputs struct {
 // Container defines an execution container
 type Container struct {
 	//ToDo: check dockerOptions, dockerVolumeBind, containerPortMappings, sidecarOptions, sidecarVolumeBind
-	Command         []string    `json:"command"`
-	EnvVars         []EnvVar    `json:"env"`
-	Image           string      `json:"image"`
-	ImagePullPolicy string      `json:"imagePullPolicy"`
-	Name            string      `json:"name"`
-	ReadyCommand    string      `json:"readyCommand"`
-	Shell           string      `json:"shell"`
-	WorkingDir      string      `json:"workingDir"`
-	Conditions      []Condition `json:"conditions,omitempty"`
-	Options         []Option    `json:"options,omitempty"`
+	Command         []string         `json:"command"`
+	EnvVars         []EnvVar         `json:"env"`
+	Image           string           `json:"image"`
+	ImagePullPolicy string           `json:"imagePullPolicy"`
+	Name            string           `json:"name"`
+	ReadyCommand    string           `json:"readyCommand"`
+	Shell           string           `json:"shell"`
+	WorkingDir      string           `json:"workingDir"`
+	Conditions      []Condition      `json:"conditions,omitempty"`
+	Options         []Option         `json:"options,omitempty"`
+	SecurityContext *SecurityContext `json:"securityContext,omitempty"`
 	//VolumeMounts    []VolumeMount `json:"volumeMounts,omitempty"`
+}
+
+type SecurityContext struct {
+	RunAsUser int `json:"runAsUser,omitempty"`
 }
 
 // ToDo: Add the missing Volumes part to enable the volume mount completely
@@ -221,7 +226,7 @@ func (m *StepData) GetContextParameterFilters() StepFilters {
 		}
 	}
 	if len(m.Spec.Containers) > 0 {
-		parameterKeys := []string{"containerCommand", "containerShell", "dockerEnvVars", "dockerImage", "dockerName", "dockerOptions", "dockerPullImage", "dockerVolumeBind", "dockerWorkspace", "dockerRegistryUrl", "dockerRegistryCredentialsId"}
+		parameterKeys := []string{"containerCommand", "securityContext", "containerShell", "dockerEnvVars", "dockerImage", "dockerName", "dockerOptions", "dockerPullImage", "dockerVolumeBind", "dockerWorkspace", "dockerRegistryUrl", "dockerRegistryCredentialsId"}
 		for _, container := range m.Spec.Containers {
 			for _, condition := range container.Conditions {
 				for _, dependentParam := range condition.Params {
@@ -235,7 +240,7 @@ func (m *StepData) GetContextParameterFilters() StepFilters {
 	}
 	if len(m.Spec.Sidecars) > 0 {
 		//ToDo: support fallback for "dockerName" configuration property -> via aliasing?
-		contextFilters = append(contextFilters, []string{"containerName", "containerPortMappings", "dockerName", "sidecarEnvVars", "sidecarImage", "sidecarName", "sidecarOptions", "sidecarPullImage", "sidecarReadyCommand", "sidecarVolumeBind", "sidecarWorkspace"}...)
+		contextFilters = append(contextFilters, []string{"containerName", "securityContext", "containerPortMappings", "dockerName", "sidecarEnvVars", "sidecarImage", "sidecarName", "sidecarOptions", "sidecarPullImage", "sidecarReadyCommand", "sidecarVolumeBind", "sidecarWorkspace"}...)
 		//ToDo: add condition param.Value and param.Name to filter as for Containers
 	}
 

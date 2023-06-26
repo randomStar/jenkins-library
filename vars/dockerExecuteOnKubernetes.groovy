@@ -124,6 +124,10 @@ import hudson.AbortException
      */
     'dockerImage',
     /**
+     * UID running the container.
+     */
+    'containerUser',
+    /**
      * Specifies a dedicated user home directory for the container which will be passed as value for environment variable `HOME`.
      */
     'dockerWorkspace',
@@ -498,7 +502,7 @@ private List getInitContainerList(config){
 }
 
 private List getContainerList(config) {
-
+    echo "This is the config: ${config}"
     //If no custom jnlp agent provided as default jnlp agent (jenkins/jnlp-slave) as defined in the plugin, see https://github.com/jenkinsci/kubernetes-plugin#pipeline-support
     def result = []
     //allow definition of jnlp image via environment variable JENKINS_JNLP_IMAGE in the Kubernetes landscape or via config as fallback
@@ -547,6 +551,13 @@ private List getContainerList(config) {
                     '-c',
                     configuredCommand
                 ]
+        }
+
+
+        if (config.containerUser) {
+            containerSpec.securityContext = [
+                runAsUser: config.containerUser
+            ]
         }
 
         if (config.containerPortMappings?.get(imageName)) {

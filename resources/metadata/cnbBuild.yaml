@@ -34,6 +34,14 @@ spec:
           ```
         type: jenkins
     params:
+      - name: containerUser
+        type: int
+        description: UID running the container
+        scope:
+          - GENERAL
+          - PARAMETERS
+          - STAGES
+          - STEPS
       - name: containerImageName
         aliases:
           - name: dockerImageName
@@ -362,3 +370,5 @@ spec:
             type: sbom
   containers:
     - image: "paketobuildpacks/builder:base"
+      securityContext:
+        runAsUser: 0
