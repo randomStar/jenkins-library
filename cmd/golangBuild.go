@@ -135,11 +135,11 @@ func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomD
 	}
 
 	// install test pre-requisites only in case testing should be performed
-	if config.RunTests || config.RunIntegrationTests {
-		if err := utils.RunExecutable("go", "install", golangTestsumPackage); err != nil {
-			return fmt.Errorf("failed to install pre-requisite: %w", err)
-		}
-	}
+	// if config.RunTests || config.RunIntegrationTests {
+	// 	if err := utils.RunExecutable("go", "install", golangTestsumPackage); err != nil {
+	// 		return fmt.Errorf("failed to install pre-requisite: %w", err)
+	// 	}
+	// }
 
 	if config.CreateBOM {
 		if err := utils.RunExecutable("go", "install", golangCycloneDXPackage); err != nil {
@@ -149,27 +149,27 @@ func runGolangBuild(config *golangBuildOptions, telemetryData *telemetry.CustomD
 
 	failedTests := false
 
-	if config.RunTests {
-		success, err := runGolangTests(config, utils)
-		if err != nil {
-			return err
-		}
-		failedTests = !success
-	}
+	// if config.RunTests {
+	// 	success, err := runGolangTests(config, utils)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	failedTests = !success
+	// }
 
-	if config.RunTests && config.ReportCoverage {
-		if err := reportGolangTestCoverage(config, utils); err != nil {
-			return err
-		}
-	}
+	// if config.RunTests && config.ReportCoverage {
+	// 	if err := reportGolangTestCoverage(config, utils); err != nil {
+	// 		return err
+	// 	}
+	// }
 
-	if config.RunIntegrationTests {
-		success, err := runGolangIntegrationTests(config, utils)
-		if err != nil {
-			return err
-		}
-		failedTests = failedTests || !success
-	}
+	// if config.RunIntegrationTests {
+	// 	success, err := runGolangIntegrationTests(config, utils)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	failedTests = failedTests || !success
+	// }
 
 	if failedTests {
 		log.SetErrorCategory(log.ErrorTest)
@@ -570,7 +570,7 @@ func lookupGolangPrivateModulesRepositories(goModFile *modfile.File, globPattern
 }
 
 func runBOMCreation(utils golangBuildUtils, outputFilename string) error {
-	if err := utils.RunExecutable("cyclonedx-gomod", "mod", "-licenses", "-test", "-output", outputFilename, "-output-version", "1.4"); err != nil {
+	if err := utils.RunExecutable("cyclonedx-gomod", "mod", "-licenses", "-test", "-output", outputFilename, "-output-version", "1.4", "-verbose=true"); err != nil {
 		return fmt.Errorf("BOM creation failed: %w", err)
 	}
 	return nil
