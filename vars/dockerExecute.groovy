@@ -219,6 +219,7 @@ void call(Map parameters = [:], body) {
                         sidecarEnvVars: parameters.sidecarEnvVars,
                     ]
                 }
+                echo "#### Config passed to dockerExecuteOnKubernetes: ${dockerExecuteOnKubernetesParams}"
                 dockerExecuteOnKubernetes(dockerExecuteOnKubernetesParams) {
                     echo "[INFO][${STEP_NAME}] Executing inside a Kubernetes Pod"
                     body()

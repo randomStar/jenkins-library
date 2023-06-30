@@ -215,6 +215,7 @@ import hudson.AbortException
      * Command executed inside the init container shell. Please enter command without providing any "sh -c" prefix. For example for an echo message, simply enter: echo `HelloWorld`
      */
     'initContainerCommand',
+    'containerUser',
 
 ])
 @Field Set PARAMETER_KEYS = STEP_CONFIG_KEYS.minus([
@@ -267,6 +268,7 @@ void call(Map parameters = [:], body) {
             config.containerMap = [(config.get('dockerImage')): config.containerName]
             config.containerCommands = config.containerCommand ? [(config.get('dockerImage')): config.containerCommand] : null
         }
+        echo "#### Config passed to executeOnPod: ${config}"
         executeOnPod(config, utils, body, script)
     }
 }
