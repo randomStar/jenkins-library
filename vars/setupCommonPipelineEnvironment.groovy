@@ -104,6 +104,8 @@ void call(Map parameters = [:]) {
             .mixinGeneralConfig(script.commonPipelineEnvironment, GENERAL_CONFIG_KEYS)
             .use()
 
+        echo "config from open-source step:: ${config}"
+
         inferBuildTool(script, config)
 
         (parameters.utils ?: new Utils()).pushToSWA([
