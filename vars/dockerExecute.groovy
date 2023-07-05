@@ -122,7 +122,9 @@ import groovy.transform.Field
     /**
      * Specific stashes that should be considered for the step execution.
      */
-    'stashContent'
+    'stashContent',
+    'securityContext',
+    'containerUser'
 ])
 @Field Set PARAMETER_KEYS = STEP_CONFIG_KEYS.plus([
     /**
@@ -202,6 +204,8 @@ void call(Map parameters = [:], body) {
                     dockerEnvVars: config.dockerEnvVars,
                     dockerWorkspace: config.dockerWorkspace,
                     stashContent: config.stashContent,
+                    securityContext: config.securityContext,
+                    containerUser: config.containerUser,
                     stashNoDefaultExcludes: config.stashNoDefaultExcludes,
                 ]
 
@@ -215,6 +219,7 @@ void call(Map parameters = [:], body) {
                         sidecarEnvVars: parameters.sidecarEnvVars,
                     ]
                 }
+                echo "#### Config passed to dockerExecuteOnKubernetes: ${dockerExecuteOnKubernetesParams}"
                 dockerExecuteOnKubernetes(dockerExecuteOnKubernetesParams) {
                     echo "[INFO][${STEP_NAME}] Executing inside a Kubernetes Pod"
                     body()

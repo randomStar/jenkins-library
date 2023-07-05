@@ -481,7 +481,7 @@ func cnbBuildMetadata() config.StepData {
 				},
 			},
 			Containers: []config.Container{
-				{Image: "paketobuildpacks/builder:base"},
+				{Image: "paketobuildpacks/builder-jammy-base"},
 			},
 			Outputs: config.StepOutputs{
 				Resources: []config.StepResources{

@@ -263,11 +263,13 @@ void call(Map parameters = [:], body) {
             config.containerMap = [(config.get('dockerImage')): config.containerName]
             config.containerCommands = config.containerCommand ? [(config.get('dockerImage')): config.containerCommand] : null
         }
+        echo "#### Config passed to executeOnPod: ${config}"
         executeOnPod(config, utils, body, script)
     }
 }
 
 def getOptions(config) {
+    echo "#### Config passed to getOptions: ${config}"
     def namespace = config.jenkinsKubernetes.namespace
     def options = [
         name : 'dynamic-agent-' + config.uniqueId,
@@ -361,6 +363,7 @@ private void lsDir(String message) {
 }
 
 private String generatePodSpec(Map config) {
+    echo "#### Config passed to generatePodSpec: ${config}"
     def podSpec = [
         apiVersion: "v1",
         kind      : "Pod",
@@ -451,6 +454,7 @@ private Map getAdditionalPodProperties(Map config) {
 }
 
 private Map getSecurityContext(Map config) {
+    echo "#### Config passed to getSecurityContext: ${config}"
     return config.securityContext ?: config.jenkinsKubernetes.securityContext ?: [:]
 }
 
@@ -498,7 +502,7 @@ private List getInitContainerList(config){
 }
 
 private List getContainerList(config) {
-
+    echo "#### Config passed to getContainerList: ${config}"
     //If no custom jnlp agent provided as default jnlp agent (jenkins/jnlp-slave) as defined in the plugin, see https://github.com/jenkinsci/kubernetes-plugin#pipeline-support
     def result = []
     //allow definition of jnlp image via environment variable JENKINS_JNLP_IMAGE in the Kubernetes landscape or via config as fallback
@@ -548,6 +552,8 @@ private List getContainerList(config) {
                     configuredCommand
                 ]
         }
+
+        containerSpec.securityContext = config.securityContext
 
         if (config.containerPortMappings?.get(imageName)) {
             def ports = []
