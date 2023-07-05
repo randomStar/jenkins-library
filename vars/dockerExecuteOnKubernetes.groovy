@@ -521,7 +521,8 @@ private List getContainerList(config) {
         }
 
         jnlpSpec.securityContext = [
-            runAsUser: 1000
+            // Need to run as root b/c chwon /home/jenkins/agent
+            runAsUser: 0
         ]
 
         result.push(jnlpSpec)
