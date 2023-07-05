@@ -520,6 +520,10 @@ private List getContainerList(config) {
             jnlpSpec.resources = resources
         }
 
+        jnlpSpec.securityContext = [
+            runAsUser: 1000
+        ]
+
         result.push(jnlpSpec)
     }
     config.containerMap.each { imageName, containerName ->
