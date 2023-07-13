@@ -130,11 +130,11 @@ It is primarily made for the transportRequestUploadSOLMAN step to provide the ch
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
 				}
-				if len(GeneralConfig.HookConfig.SplunkConfig.ProdDsn) > 0 {
+				if len(GeneralConfig.HookConfig.SplunkConfig.ProdCriblEndpoint) > 0 {
 					splunkClient.Initialize(GeneralConfig.CorrelationID,
-						GeneralConfig.HookConfig.SplunkConfig.ProdDsn,
-						GeneralConfig.HookConfig.SplunkConfig.ProdToken,
-						GeneralConfig.HookConfig.SplunkConfig.ProdIndex,
+						GeneralConfig.HookConfig.SplunkConfig.ProdCriblEndpoint,
+						GeneralConfig.HookConfig.SplunkConfig.ProdCriblToken,
+						GeneralConfig.HookConfig.SplunkConfig.ProdCriblIndex,
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
 				}

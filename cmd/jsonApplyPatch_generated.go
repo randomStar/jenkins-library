@@ -98,11 +98,11 @@ This step can, e.g., be used if there is a json schema which needs to be patched
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
 				}
-				if len(GeneralConfig.HookConfig.SplunkConfig.ProdDsn) > 0 {
+				if len(GeneralConfig.HookConfig.SplunkConfig.ProdCriblEndpoint) > 0 {
 					splunkClient.Initialize(GeneralConfig.CorrelationID,
-						GeneralConfig.HookConfig.SplunkConfig.ProdDsn,
-						GeneralConfig.HookConfig.SplunkConfig.ProdToken,
-						GeneralConfig.HookConfig.SplunkConfig.ProdIndex,
+						GeneralConfig.HookConfig.SplunkConfig.ProdCriblEndpoint,
+						GeneralConfig.HookConfig.SplunkConfig.ProdCriblToken,
+						GeneralConfig.HookConfig.SplunkConfig.ProdCriblIndex,
 						GeneralConfig.HookConfig.SplunkConfig.SendLogs)
 					splunkClient.Send(telemetryClient.GetData(), logCollector)
 				}
