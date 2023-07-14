@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/SAP/jenkins-library/pkg/buildpacks"
 	"github.com/SAP/jenkins-library/pkg/cnbutils"
 	piperconf "github.com/SAP/jenkins-library/pkg/config"
 	piperhttp "github.com/SAP/jenkins-library/pkg/http"
@@ -162,8 +163,8 @@ func TestRunCnbBuild(t *testing.T) {
 		utils.FilesMock.AddFile("project.toml", []byte(projectToml))
 		addBuilderFiles(&utils)
 
-		telemetryData := telemetry.CustomData{}
-		err := callCnbBuild(&config, &telemetryData, &utils, &commonPipelineEnvironment, &piperhttp.Client{})
+		telemetryData := &telemetry.CustomData{}
+		err := callCnbBuild(&config, telemetryData, &utils, &commonPipelineEnvironment, &piperhttp.Client{})
 
 		require.NoError(t, err)
 		runner := utils.ExecMockRunner
@@ -177,11 +178,12 @@ func TestRunCnbBuild(t *testing.T) {
 		assert.Contains(t, commonPipelineEnvironment.container.imageDigests, "sha256:52eac630560210e5ae13eb10797c4246d6f02d425f32b9430ca00bde697c79ec")
 
 		customDataAsString := telemetryData.Custom1
-		customData := cnbBuildTelemetry{}
+		customData := buildpacks.NewBuildpacksTelemetry(telemetryData)
 		err = json.Unmarshal([]byte(customDataAsString), &customData)
 		require.NoError(t, err)
-		assert.Equal(t, 1, len(customData.Data))
-		assert.Equal(t, "root", string(customData.Data[0].Path))
+		content := customData.Data()
+		assert.Equal(t, 1, len(content))
+		assert.Equal(t, "root", string(content[0].Path))
 	})
 
 	t.Run("success case (registry with https)", func(t *testing.T) {
@@ -601,31 +603,31 @@ uri = "some-buildpack"`))
 
 		addBuilderFiles(&utils)
 
-		telemetryData := telemetry.CustomData{}
-		err := callCnbBuild(&config, &telemetryData, &utils, &cnbBuildCommonPipelineEnvironment{}, &piperhttp.Client{})
+		telemetryData := &telemetry.CustomData{}
+		err := callCnbBuild(&config, telemetryData, &utils, &cnbBuildCommonPipelineEnvironment{}, &piperhttp.Client{})
 		require.NoError(t, err)
 
 		customDataAsString := telemetryData.Custom1
-		customData := cnbBuildTelemetry{}
+		customData := buildpacks.NewBuildpacksTelemetry(telemetryData)
 		err = json.Unmarshal([]byte(customDataAsString), &customData)
 
 		require.NoError(t, err)
-		assert.Equal(t, 3, customData.Version)
-		require.Equal(t, 1, len(customData.Data))
-		assert.Equal(t, "3.1.5", customData.Data[0].ImageTag)
-		assert.Equal(t, "folder", string(customData.Data[0].Path))
-		assert.Contains(t, customData.Data[0].AdditionalTags, "latest")
-		assert.Contains(t, customData.Data[0].BindingKeys, "SECRET")
-		assert.Equal(t, "paketobuildpacks/builder:base", customData.Data[0].Builder)
+		assert.Equal(t, 3, customData.Version())
+		require.Equal(t, 1, len(customData.Data()))
+		assert.Equal(t, "3.1.5", customData.Data()[0].ImageTag)
+		assert.Equal(t, "folder", string(customData.Data()[0].Path))
+		assert.Contains(t, customData.Data()[0].AdditionalTags, "latest")
+		assert.Contains(t, customData.Data()[0].BindingKeys, "SECRET")
+		assert.Equal(t, "paketobuildpacks/builder:base", customData.Data()[0].Builder)
 
-		assert.Contains(t, customData.Data[0].Buildpacks.FromConfig, "paketobuildpacks/java")
-		assert.NotContains(t, customData.Data[0].Buildpacks.FromProjectDescriptor, "paketobuildpacks/java")
-		assert.Contains(t, customData.Data[0].Buildpacks.FromProjectDescriptor, "bcc73ab1f0a0d3fb0d1bf2b6df5510a25ccd14a761dbc0f5044ea24ead30452b")
-		assert.Contains(t, customData.Data[0].Buildpacks.Overall, "paketobuildpacks/java")
+		assert.Contains(t, customData.Data()[0].Buildpacks.FromConfig, "paketobuildpacks/java")
+		assert.NotContains(t, customData.Data()[0].Buildpacks.FromProjectDescriptor, "paketobuildpacks/java")
+		assert.Contains(t, customData.Data()[0].Buildpacks.FromProjectDescriptor, "bcc73ab1f0a0d3fb0d1bf2b6df5510a25ccd14a761dbc0f5044ea24ead30452b")
+		assert.Contains(t, customData.Data()[0].Buildpacks.Overall, "paketobuildpacks/java")
 
-		assert.True(t, customData.Data[0].ProjectDescriptor.Used)
-		assert.False(t, customData.Data[0].ProjectDescriptor.IncludeUsed)
-		assert.True(t, customData.Data[0].ProjectDescriptor.ExcludeUsed)
+		assert.True(t, customData.Data()[0].ProjectDescriptor.Used)
+		assert.False(t, customData.Data()[0].ProjectDescriptor.IncludeUsed)
+		assert.True(t, customData.Data()[0].ProjectDescriptor.ExcludeUsed)
 	})
 
 	t.Run("error case, multiple artifacts in path", func(t *testing.T) {
@@ -718,29 +720,29 @@ uri = "some-buildpack"
 
 		addBuilderFiles(&utils)
 
-		telemetryData := telemetry.CustomData{}
-		err := callCnbBuild(&config, &telemetryData, &utils, &cnbBuildCommonPipelineEnvironment{}, &piperhttp.Client{})
+		telemetryData := &telemetry.CustomData{}
+		err := callCnbBuild(&config, telemetryData, &utils, &cnbBuildCommonPipelineEnvironment{}, &piperhttp.Client{})
 		require.NoError(t, err)
 
 		customDataAsString := telemetryData.Custom1
-		customData := cnbBuildTelemetry{}
+		customData := buildpacks.NewBuildpacksTelemetry(telemetryData)
 		err = json.Unmarshal([]byte(customDataAsString), &customData)
 
 		require.NoError(t, err)
-		require.Equal(t, 1, len(customData.Data))
-		assert.Contains(t, customData.Data[0].BuildEnv.KeysFromConfig, "CONFIG_KEY")
-		assert.NotContains(t, customData.Data[0].BuildEnv.KeysFromProjectDescriptor, "CONFIG_KEY")
-		assert.Contains(t, customData.Data[0].BuildEnv.KeysOverall, "CONFIG_KEY")
+		require.Equal(t, 1, len(customData.Data()))
+		assert.Contains(t, customData.Data()[0].BuildEnv.KeysFromConfig, "CONFIG_KEY")
+		assert.NotContains(t, customData.Data()[0].BuildEnv.KeysFromProjectDescriptor, "CONFIG_KEY")
+		assert.Contains(t, customData.Data()[0].BuildEnv.KeysOverall, "CONFIG_KEY")
 
-		assert.NotContains(t, customData.Data[0].BuildEnv.KeysFromConfig, "PROJECT_KEY")
-		assert.Contains(t, customData.Data[0].BuildEnv.KeysFromProjectDescriptor, "PROJECT_KEY")
-		assert.Contains(t, customData.Data[0].BuildEnv.KeysOverall, "PROJECT_KEY")
+		assert.NotContains(t, customData.Data()[0].BuildEnv.KeysFromConfig, "PROJECT_KEY")
+		assert.Contains(t, customData.Data()[0].BuildEnv.KeysFromProjectDescriptor, "PROJECT_KEY")
+		assert.Contains(t, customData.Data()[0].BuildEnv.KeysOverall, "PROJECT_KEY")
 
-		assert.Equal(t, "8", customData.Data[0].BuildEnv.KeyValues["BP_JVM_VERSION"])
-		assert.Equal(t, "11", customData.Data[0].BuildEnv.KeyValues["BP_NODE_VERSION"])
-		assert.NotContains(t, customData.Data[0].BuildEnv.KeyValues, "PROJECT_KEY")
+		assert.Equal(t, "8", customData.Data()[0].BuildEnv.KeyValues["BP_JVM_VERSION"])
+		assert.Equal(t, "11", customData.Data()[0].BuildEnv.KeyValues["BP_NODE_VERSION"])
+		assert.NotContains(t, customData.Data()[0].BuildEnv.KeyValues, "PROJECT_KEY")
 
-		assert.Contains(t, customData.Data[0].Buildpacks.Overall, "bcc73ab1f0a0d3fb0d1bf2b6df5510a25ccd14a761dbc0f5044ea24ead30452b")
+		assert.Contains(t, customData.Data()[0].Buildpacks.Overall, "bcc73ab1f0a0d3fb0d1bf2b6df5510a25ccd14a761dbc0f5044ea24ead30452b")
 	})
 
 	t.Run("success case (multiple images configured)", func(t *testing.T) {
@@ -760,20 +762,20 @@ uri = "some-buildpack"
 		utils.FilesMock.AddFile(config.DockerConfigJSON, []byte(`{"auths":{"my-registry":{"auth":"dXNlcjpwYXNz"}}}`))
 		addBuilderFiles(&utils)
 
-		telemetryData := telemetry.CustomData{}
-		err := callCnbBuild(&config, &telemetryData, &utils, &commonPipelineEnvironment, &piperhttp.Client{})
+		telemetryData := &telemetry.CustomData{}
+		err := callCnbBuild(&config, telemetryData, &utils, &commonPipelineEnvironment, &piperhttp.Client{})
 		require.NoError(t, err)
 
 		customDataAsString := telemetryData.Custom1
-		customData := cnbBuildTelemetry{}
+		customData := buildpacks.NewBuildpacksTelemetry(telemetryData)
 		err = json.Unmarshal([]byte(customDataAsString), &customData)
 		assert.NoError(t, err)
-		require.Equal(t, expectedImageCount, len(customData.Data))
+		require.Equal(t, expectedImageCount, len(customData.Data()))
 
 		runner := utils.ExecMockRunner
 		require.Equal(t, expectedImageCount, len(runner.Calls))
 		for i, call := range runner.Calls {
-			assert.Equal(t, 4, len(customData.Data[i].AdditionalTags))
+			assert.Equal(t, 4, len(customData.Data()[i].AdditionalTags))
 			assertLifecycleCalls(t, runner, i+1)
 			containerImageName := fmt.Sprintf("my-image-%d", i)
 			assert.Contains(t, call.Params, fmt.Sprintf("%s/%s:%s", config.ContainerRegistryURL, containerImageName, config.ContainerImageTag))
