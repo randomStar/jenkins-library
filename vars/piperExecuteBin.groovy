@@ -77,7 +77,9 @@ void call(Map parameters = [:], String stepName, String metadataFile, List crede
                         try {
                             try {
                                 credentialWrapper(config, credentialInfo) {
+                                    lsDir('Directory content before step execution')
                                     sh "${piperGoPath} ${stepName}${defaultConfigArgs}${customConfigArg}"
+                                    lsDir('Directory content after step execution')
                                 }
                             } finally {
                                 jenkinsUtils.handleStepResults(stepName, failOnMissingReports, failOnMissingLinks)
@@ -311,4 +313,14 @@ static boolean checkIfStepActive(Map parameters = [:], Script script, String pip
     piperGoUtils.unstashPiperBin()
     def returnCode = script.sh(returnStatus: true, script: "${piperGoPath} checkIfStepActive ${flags}")
     return (returnCode == 0)
+}
+
+private void lsDir(String message) {
+  echo "[DEBUG] Begin of ${message}"
+  // some images might not contain the find command. In that case the build must not be aborted.
+  catchError (message: 'Cannot list directory content', buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
+    // no -ls option since this is not available for some images
+    sh  'find . -mindepth 1 -maxdepth 10'
+  }
+  echo "[DEBUG] End of ${message}"
 }
