@@ -355,7 +355,7 @@ private void lsDir(String message) {
   // some images might not contain the find command. In that case the build must not be aborted.
   catchError (message: 'Cannot list directory content', buildResult: 'SUCCESS', stageResult: 'SUCCESS') {
     // no -ls option since this is not available for some images
-    sh  'find . -mindepth 1 -maxdepth 10'
+    sh  'find . -mindepth 1 -maxdepth 3'
   }
   echo "[DEBUG] End of ${message}"
 }
